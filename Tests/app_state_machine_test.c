@@ -14,7 +14,7 @@
 #include "ctl_rate.h"
 #include "drv_bmp390.h"
 #include "drv_ibus.h"
-#include "drv_qmi8658.h"
+#include "drv_bmi088.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "fc_config.h"
@@ -57,7 +57,7 @@ FcStatus_t Drv_Ibus_GetInput(FcRcInput_t *input)
     return FC_STATUS_OK;
 }
 
-FcStatus_t Drv_Qmi8658_Read(FcImuData_t *imu)
+FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
 {
     if (imu == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
     *imu = s_mock_imu;

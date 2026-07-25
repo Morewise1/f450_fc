@@ -41,7 +41,7 @@ FcStatus_t Ctl_MixerQuadX(uint16_t throttle_us,
     }
     Ctl_MixerSetStop(output);
 
-    if ((throttle_us < FC_ESC_MIN_US) || (throttle_us > FC_ESC_MAX_US))
+    if ((throttle_us < FC_ESC_MIN_US) || (throttle_us > FC_ESC_COMMAND_MAX_US))
     {
         return FC_STATUS_INVALID_DATA;
     }
@@ -61,10 +61,11 @@ FcStatus_t Ctl_MixerQuadX(uint16_t throttle_us,
 
     for (index = 0U; index < FC_MOTOR_COUNT; ++index)
     {
-        motor[index] = clamp_float(motor[index], (float)FC_ESC_MIN_US, (float)FC_ESC_MAX_US);
+        motor[index] = clamp_float(motor[index],
+                                   (float)FC_ESC_MIN_US,
+                                   (float)FC_ESC_COMMAND_MAX_US);
         output->motor_us[index] = (uint16_t)(motor[index] + 0.5f);
     }
     output->valid = true;
     return FC_STATUS_OK;
 }
-

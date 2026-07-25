@@ -12,9 +12,9 @@
 #include "ctl_altitude.h"
 #include "ctl_attitude.h"
 #include "ctl_rate.h"
+#include "drv_bmi088.h"
 #include "drv_bmp390.h"
 #include "drv_ibus.h"
-#include "drv_qmi8658.h"
 #include "drv_vl53l1x.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
@@ -50,11 +50,11 @@ FcStatus_t App_MainInit(void)
     (void)BSP_DebugUart_Init();
 
     record_failure(Drv_Ibus_Init());
-    imu_status = Drv_Qmi8658_Init();
+    imu_status = Drv_Bmi088_Init();
     record_failure(imu_status);
     if (imu_status == FC_STATUS_OK)
     {
-        record_failure(Drv_Qmi8658_CalibrateGyro());
+        record_failure(Drv_Bmi088_CalibrateGyro());
     }
     (void)Drv_Bmp390_Init();
     (void)Drv_Vl53l1x_Init();

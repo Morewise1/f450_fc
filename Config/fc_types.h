@@ -109,6 +109,18 @@ typedef struct
     uint32_t last_frame_ms;
 } FcRcInput_t;
 
+/* Nonlinear pilot intent after deadband/expo mapping. */
+typedef struct
+{
+    float roll;
+    float pitch;
+    float yaw;
+    float throttle;
+    float climb_rate;
+    bool motor_safe;
+    bool valid;
+} FcPilotCommand_t;
+
 typedef struct
 {
     uint16_t motor_us[FC_MOTOR_COUNT];
@@ -159,4 +171,3 @@ typedef struct
 } FcControlOutput_t;
 
 #endif /* FC_TYPES_H */
-

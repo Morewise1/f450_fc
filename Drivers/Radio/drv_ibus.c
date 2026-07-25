@@ -62,6 +62,12 @@ static uint16_t clamp_throttle(int32_t value)
     return (uint16_t)value;
 }
 
+static bool decode_switch(uint16_t value, uint32_t active_high)
+{
+    bool above_threshold = value >= FC_IBUS_SWITCH_THRESHOLD_RAW;
+    return (active_high != 0U) ? above_threshold : !above_threshold;
+}
+
 static void make_failsafe_input(FcRcInput_t *input, uint32_t last_frame_ms)
 {
     *input = (FcRcInput_t){0};
@@ -141,10 +147,10 @@ static bool decode_and_commit(uint32_t timestamp_ms)
     decoded.yaw = clamp_axis(((int32_t)yaw_raw - FC_IBUS_RAW_CENTER) * FC_RC_YAW_SIGN);
     decoded.throttle = clamp_throttle((int32_t)throttle_raw - FC_IBUS_RAW_MIN);
     decoded.throttle_low = decoded.throttle <= FC_RC_THROTTLE_ARM_MAX;
-    decoded.arm_switch = arm_raw >= FC_IBUS_SWITCH_THRESHOLD_RAW;
-    decoded.mode_switch = mode_raw >= FC_IBUS_SWITCH_THRESHOLD_RAW;
+    decoded.arm_switch = decode_switch(arm_raw, FC_IBUS_ARM_ACTIVE_HIGH);
+    decoded.mode_switch = decode_switch(mode_raw, FC_IBUS_MODE_ACTIVE_HIGH);
 
-    /* FS-iA6B has six channels: CH5 is both arm and safety permission. */
+    /* FS-i6 auxiliary setup: CH5=SwD, used as both arm and safety permission. */
     decoded.safety_switch = decoded.arm_switch;
     decoded.emergency_stop = false;
     decoded.link_valid = true;

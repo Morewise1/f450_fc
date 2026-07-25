@@ -11,6 +11,8 @@
 #define FC_IBUS_CHANNEL_MODE             5U
 
 #define FC_IBUS_SWITCH_THRESHOLD_RAW  1500U
+#define FC_IBUS_ARM_ACTIVE_HIGH          1U
+#define FC_IBUS_MODE_ACTIVE_HIGH         1U
 #define FC_IBUS_RAW_MIN               1000U
 #define FC_IBUS_RAW_CENTER            1500U
 #define FC_IBUS_RAW_MAX               2000U
@@ -34,5 +36,21 @@
 #define FC_ATTITUDE_ROLL_KP             0.0f
 #define FC_ATTITUDE_PITCH_KP            0.0f
 
-#endif /* FC_PARAMS_H */
+/* Advanced PID capabilities are available, but conservative defaults apply. */
+#define FC_PID_OUTPUT_OFFSET             0.0f
+#define FC_PID_INPUT_DEADBAND            0.0f
+#define FC_PID_INTEGRAL_SEPARATION      80.0f
+#define FC_PID_VARIABLE_I_FULL_ERROR    10.0f
+#define FC_PID_VARIABLE_I_ZERO_ERROR   100.0f
+#define FC_PID_DERIVATIVE_LPF_HZ        30.0f
+#define FC_PID_ENABLE_INTEGRAL_SEPARATION 0U
+#define FC_PID_ENABLE_VARIABLE_INTEGRAL   0U
+#define FC_PID_ENABLE_ANTI_WINDUP          1U
+#define FC_PID_DERIVATIVE_ON_MEASUREMENT   1U
+#define FC_PID_ENABLE_DERIVATIVE_LPF       1U
 
+#if (FC_IBUS_ARM_ACTIVE_HIGH > 1U) || (FC_IBUS_MODE_ACTIVE_HIGH > 1U)
+#error "i-BUS switch polarity macros must be 0 or 1"
+#endif
+
+#endif /* FC_PARAMS_H */

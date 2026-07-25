@@ -108,7 +108,8 @@ int main(void)
 
     if (BSP_EscPwm_ClampUs(500U) != 1000U) { return 1; }
     if (BSP_EscPwm_ClampUs(1500U) != 1500U) { return 2; }
-    if (BSP_EscPwm_ClampUs(2500U) != 2000U) { return 3; }
+    if (BSP_EscPwm_ClampUs(2500U) != FC_ESC_COMMAND_MAX_US) { return 3; }
+    if (BSP_EscPwm_WriteTestUs(FC_MOTOR_INDEX_M1, 1100U) != FC_STATUS_NOT_READY) { return 35; }
 
     /* A partial start failure must stop every channel that already started. */
     s_fail_start_motor = FC_MOTOR_INDEX_M3;
@@ -140,13 +141,13 @@ int main(void)
     if (s_compare[0] != pulse_to_ticks(1000U, FC_ESC_M1_COUNTER_HZ)) { return 20; }
     if (s_compare[1] != pulse_to_ticks(FC_ESC_IDLE_US, FC_ESC_M2_COUNTER_HZ)) { return 21; }
     if (s_compare[2] != pulse_to_ticks(1500U, FC_ESC_M3_COUNTER_HZ)) { return 22; }
-    if (s_compare[3] != pulse_to_ticks(2000U, FC_ESC_M4_COUNTER_HZ)) { return 23; }
+    if (s_compare[3] != pulse_to_ticks(FC_ESC_COMMAND_MAX_US, FC_ESC_M4_COUNTER_HZ)) { return 23; }
 
     if (BSP_EscPwm_GetLastCommand(&last) != FC_STATUS_OK) { return 24; }
     if ((last.motor_us[0] != 1000U) ||
         (last.motor_us[1] != FC_ESC_IDLE_US) ||
         (last.motor_us[2] != 1500U) ||
-        (last.motor_us[3] != 2000U) || !last.valid) { return 25; }
+        (last.motor_us[3] != FC_ESC_COMMAND_MAX_US) || !last.valid) { return 25; }
 
     if (BSP_EscPwm_WriteAll(&invalid_output) != FC_STATUS_INVALID_ARGUMENT) { return 26; }
     if (BSP_EscPwm_IsOutputEnabled() || !all_channels_stopped()) { return 27; }

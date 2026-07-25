@@ -30,9 +30,16 @@ extern SPI_HandleTypeDef hspi1;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern GPIO_TypeDef g_fake_qmi_cs_port;
+extern GPIO_TypeDef g_fake_bmi_accel_cs_port;
+extern GPIO_TypeDef g_fake_bmi_gyro_cs_port;
 
 #define FC_QMI8658_CS_GPIO_PORT (&g_fake_qmi_cs_port)
 #define FC_QMI8658_CS_PIN       ((uint16_t)0x0010U)
+
+#define FC_BMI088_ACCEL_CS_GPIO_PORT (&g_fake_bmi_accel_cs_port)
+#define FC_BMI088_ACCEL_CS_PIN       ((uint16_t)0x0020U)
+#define FC_BMI088_GYRO_CS_GPIO_PORT  (&g_fake_bmi_gyro_cs_port)
+#define FC_BMI088_GYRO_CS_PIN        ((uint16_t)0x0040U)
 
 #define FC_ESC_M1_TIM_HANDLE  htim3
 #define FC_ESC_M1_TIM_CHANNEL TIM_CHANNEL_1

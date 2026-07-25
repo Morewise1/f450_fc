@@ -4,7 +4,7 @@
 
 ## 当前结果
 
-当前具备裸机 cooperative scheduler、安全状态机、i-BUS、QMI8658C SPI、4 路标准 PWM ESC、PID、Quad-X mixer、CMake 构建和主机端测试。
+当前具备裸机 cooperative scheduler、安全状态机、i-BUS、BMI088 SPI、4 路标准 PWM ESC、PID、Quad-X mixer、CMake 构建和主机端测试。
 
 - scheduler 由 1 ms tick 释放 500/250/100/50/10 Hz 标志。
 - 初始状态为 STOP，安全条件通过后依次进入 READY、RUNNING。
@@ -13,7 +13,7 @@
 - PWM 驱动按每个通道的定时器计数频率计算 CCR，不假设 72 MHz 或 1 tick/us。
 - App 通过独立输出许可控制解锁，BSP 不解释飞行状态。
 - 未解锁、初始化失败、传感器无效和急停时保持四路 1000 us。
-- QMI8658C 支持 ID、物理单位换算、轴映射和非阻塞陀螺校准。
+- BMI088 支持双芯片 ID、物理单位换算、轴映射和非阻塞陀螺校准。
 - BMP390、VL53L1X、电池 ADC 和调试 UART 仍为安全 stub。
 - ALT_HOLD 只有状态机和接口，当前不能进行实机定高飞行。
 - 不包含 FreeRTOS、光流、GPS 或磁力计逻辑。
@@ -31,7 +31,7 @@ ctest --test-dir build --output-on-failure
 - 500/250/100/50/10 Hz scheduler 标志和 missed deadline。
 - STOP/READY/RUNNING、模式切换、PID reset 和 failsafe。
 - i-BUS 解析及无硬件安全状态。
-- QMI8658C fake-HAL、轴映射、校准和错误帧。
+- BMI088 fake-HAL、双 CS、轴映射、校准和通信错误。
 - ESC fake-HAL、多定时器不同计数频率、1000/1500/2000 us 和启动失败回收。
 
 ## CubeMX/HAL 集成
@@ -39,7 +39,7 @@ ctest --test-dir build --output-on-failure
 1. 用具体 STM32F407 型号生成 HAL 工程。
 2. 在 `main.c` 中调用 `App_Init()` 与 `App_Loop()`。
 3. 1 ms 定时器的 `HAL_TIM_PeriodElapsedCallback()` 只调用 `App_Scheduler1msTick()`。
-4. SPI1 生成 `hspi1`，并配置 QMI8658C CS。
+4. SPI1 生成 `hspi1`，并分别配置 BMI088 加速度计和陀螺仪 CS。
 5. 配置四路 PWM，在 `fc_board.h` 映射 TIM 句柄、通道和计数频率。
 6. 启用 `FC_USE_STM32_HAL=1` 后先完成无桨波形测试。
 
@@ -48,7 +48,7 @@ ctest --test-dir build --output-on-failure
 - [Docs/app_scheduler_and_state_machine.md](Docs/app_scheduler_and_state_machine.md)
 - [Docs/esc_pwm_hal_integration.md](Docs/esc_pwm_hal_integration.md)
 - [Docs/no_prop_motor_test.md](Docs/no_prop_motor_test.md)
-- [Docs/qmi8658_hal_integration.md](Docs/qmi8658_hal_integration.md)
+- [Docs/bmi088_hal_integration.md](Docs/bmi088_hal_integration.md)
 
 ## 安全不变量
 

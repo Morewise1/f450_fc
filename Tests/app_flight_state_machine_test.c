@@ -14,7 +14,7 @@
 #include "ctl_rate.h"
 #include "drv_bmp390.h"
 #include "drv_ibus.h"
-#include "drv_qmi8658.h"
+#include "drv_bmi088.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "fc_config.h"
@@ -31,6 +31,7 @@ static FcMotorOutput_t s_esc_output;
 static uint32_t s_rate_reset_count;
 static uint32_t s_attitude_reset_count;
 static uint32_t s_altitude_reset_count;
+static bool s_bias_tracking_enabled;
 
 static void set_motor_stop(FcMotorOutput_t *output)
 {
@@ -104,12 +105,29 @@ FcStatus_t Drv_Ibus_GetInput(FcRcInput_t *input)
     return FC_STATUS_OK;
 }
 
-FcStatus_t Drv_Qmi8658_Read(FcImuData_t *imu)
+FcStatus_t Drv_Ibus_GetRawChannels(uint16_t channels[FC_IBUS_CHANNEL_COUNT])
+{
+    uint32_t channel;
+    if (channels == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    for (channel = 0U; channel < FC_IBUS_CHANNEL_COUNT; ++channel)
+    {
+        channels[channel] = 1500U;
+    }
+    return FC_STATUS_OK;
+}
+
+FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
 {
     if (imu == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
     *imu = s_fake_imu;
     imu->timestamp_ms = s_tick_ms;
     return imu->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
+FcStatus_t Drv_Bmi088_SetBiasTrackingEnabled(bool enabled)
+{
+    s_bias_tracking_enabled = enabled;
+    return FC_STATUS_OK;
 }
 
 FcStatus_t BSP_BatteryAdc_Read(FcBatteryStatus_t *status, uint32_t timestamp_ms)
@@ -279,6 +297,7 @@ int main(void)
 
     s_tick_ms = 2U;
     App_FlightTask500Hz();
+    if (!s_bias_tracking_enabled) { return 23; }
     s_tick_ms = 4U;
     App_FlightTask250Hz();
     s_tick_ms = 20U;
@@ -301,6 +320,7 @@ int main(void)
     App_FlightTask250Hz();
     s_tick_ms = 26U;
     App_FlightTask500Hz();
+    if (s_bias_tracking_enabled) { return 24; }
     if (!s_esc_enabled || motors_are_stopped(&s_esc_output)) { return 8; }
     if (App_FlightGetMotorOutput(&flight_output) != FC_STATUS_OK ||
         motors_are_stopped(&flight_output)) { return 9; }

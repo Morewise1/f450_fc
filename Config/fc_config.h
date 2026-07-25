@@ -29,6 +29,15 @@
 #define FC_ESC_IDLE_US                   1100U
 #endif
 #define FC_ESC_MAX_US                    2000U
+#ifndef FC_ESC_COMMAND_MAX_US
+#define FC_ESC_COMMAND_MAX_US            2000U
+#endif
+#ifndef FC_MOTOR_TEST_MAX_US
+#define FC_MOTOR_TEST_MAX_US             1200U
+#endif
+#ifndef FC_ENABLE_MOTOR_TEST
+#define FC_ENABLE_MOTOR_TEST                0U
+#endif
 #ifndef FC_ESC_PWM_FRAME_HZ
 #define FC_ESC_PWM_FRAME_HZ               400U
 #endif
@@ -44,6 +53,11 @@
 #define FC_RC_THROTTLE_ARM_MAX              50U
 #define FC_RC_THROTTLE_TAKEOFF_MIN         100U
 #define FC_RC_TIMEOUT_MS                   100U
+#define FC_RC_AXIS_DEADBAND                  25
+#define FC_RC_AXIS_EXPO                     0.30f
+#define FC_RC_THROTTLE_DEADBAND             30U
+#define FC_RC_THROTTLE_EXPO                 0.30f
+#define FC_RC_MAX_CLIMB_RATE_MPS             2.0f
 
 #define FC_IBUS_FRAME_LENGTH                32U
 #define FC_IBUS_CHANNEL_COUNT               14U
@@ -56,10 +70,20 @@
 #define FC_IMU_CAL_MAX_GYRO_DPS              3.0f
 #define FC_IMU_CAL_ACCEL_MAG_MIN_SQ           0.7225f
 #define FC_IMU_CAL_ACCEL_MAG_MAX_SQ           1.3225f
+#define FC_IMU_BIAS_TRACK_ALPHA                0.0002f
 
-#define FC_QMI8658_SPI_TIMEOUT_MS             1U
-#define FC_QMI8658_RESET_DELAY_MS             10U
-#define FC_QMI8658_EXPECTED_WHO_AM_I        0x05U
+#define FC_AHRS_MAHONY_KP                      2.0f
+#define FC_AHRS_MAHONY_KI                      0.05f
+#define FC_AHRS_ACCEL_MIN_NORM_SQ              0.25f
+#define FC_AHRS_ACCEL_MAX_NORM_SQ              2.25f
+
+#define FC_BMI088_SPI_TIMEOUT_MS               1U
+#define FC_BMI088_STARTUP_DELAY_MS            10U
+#define FC_BMI088_ACCEL_RESET_DELAY_MS         5U
+#define FC_BMI088_ACCEL_POWER_DELAY_MS        50U
+#define FC_BMI088_GYRO_RESET_DELAY_MS         30U
+#define FC_BMI088_EXPECTED_ACCEL_CHIP_ID     0x1EU
+#define FC_BMI088_EXPECTED_GYRO_CHIP_ID      0x0FU
 
 #define FC_MAX_TARGET_TILT_DEG             25.0f
 #define FC_MAX_TARGET_YAW_RATE_DPS        180.0f
@@ -107,6 +131,22 @@
 
 #if (FC_ESC_IDLE_US < FC_ESC_MIN_US) || (FC_ESC_IDLE_US > FC_ESC_MAX_US)
 #error "FC_ESC_IDLE_US must be inside the ESC range"
+#endif
+
+#if (FC_ESC_COMMAND_MAX_US < FC_ESC_IDLE_US) || (FC_ESC_COMMAND_MAX_US > FC_ESC_MAX_US)
+#error "FC_ESC_COMMAND_MAX_US must be between idle and the protocol maximum"
+#endif
+
+#if (FC_MOTOR_TEST_MAX_US < FC_ESC_MIN_US) || (FC_MOTOR_TEST_MAX_US > FC_ESC_COMMAND_MAX_US)
+#error "FC_MOTOR_TEST_MAX_US must be inside the allowed command range"
+#endif
+
+#if (FC_RC_AXIS_DEADBAND < 0) || (FC_RC_AXIS_DEADBAND >= FC_RC_AXIS_MAX)
+#error "FC_RC_AXIS_DEADBAND must be inside the normalized stick range"
+#endif
+
+#if (FC_RC_THROTTLE_DEADBAND >= FC_RC_THROTTLE_MAX)
+#error "FC_RC_THROTTLE_DEADBAND must be below full throttle"
 #endif
 
 #if (FC_ESC_TIMER_COUNTER_HZ == 0U) || (FC_ESC_PWM_FRAME_HZ == 0U)

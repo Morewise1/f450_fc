@@ -8,10 +8,11 @@
 #include "ctl_altitude.h"
 #include "ctl_attitude.h"
 #include "ctl_mixer.h"
+#include "ctl_rc_map.h"
 #include "ctl_rate.h"
+#include "drv_bmi088.h"
 #include "drv_bmp390.h"
 #include "drv_ibus.h"
-#include "drv_qmi8658.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "fc_config.h"
@@ -19,6 +20,7 @@
 static FcFlightState_t s_state;
 static FcFlightMode_t s_mode;
 static FcRcInput_t s_rc;
+static FcPilotCommand_t s_pilot;
 static FcImuData_t s_imu;
 static FcAttitude_t s_attitude;
 static FcBatteryStatus_t s_battery;
@@ -30,6 +32,27 @@ static AppFlightTaskStats_t s_task_stats;
 static float s_altitude_target_m;
 static float s_altitude_correction_us;
 static bool s_initialized;
+volatile AppFlightDebug_t g_fc_flight_debug;
+
+static void publish_debug_snapshot(void)
+{
+    AppFlightDebug_t snapshot = {0};
+
+    snapshot.imu = s_imu;
+    snapshot.attitude = s_attitude;
+    snapshot.receiver = s_rc;
+    snapshot.pilot = s_pilot;
+    snapshot.motors = s_motor_output;
+    snapshot.control = s_control_output;
+    snapshot.target_rate_dps = s_target_rate_dps;
+    snapshot.state = s_state;
+    snapshot.mode = s_mode;
+    snapshot.motor_safe = App_SafetyMotorOutputAllowed();
+    snapshot.publish_count = g_fc_flight_debug.publish_count + 1U;
+    (void)App_SafetyGetStatus(&snapshot.safety);
+    (void)Drv_Ibus_GetRawChannels(snapshot.raw_channels);
+    g_fc_flight_debug = snapshot;
+}
 
 static void hold_motors_stopped(void)
 {
@@ -122,6 +145,7 @@ static FcStatus_t transition_state(FcFlightState_t next_state)
 static void force_stop(void)
 {
     (void)transition_state(FC_STATE_STOP);
+    publish_debug_snapshot();
 }
 
 static FcStatus_t change_mode(FcFlightMode_t next_mode)
@@ -156,14 +180,15 @@ static FcStatus_t change_mode(FcFlightMode_t next_mode)
 
 static uint16_t build_throttle_command_us(void)
 {
-    float throttle_us = (float)FC_ESC_MIN_US + (float)s_rc.throttle;
+    float command_span = (float)(FC_ESC_COMMAND_MAX_US - FC_ESC_MIN_US);
+    float throttle_us = (float)FC_ESC_MIN_US + (s_pilot.throttle * command_span);
 
     if (s_mode == FC_MODE_ALT_HOLD)
     {
         throttle_us += s_altitude_correction_us;
     }
     if (throttle_us < (float)FC_ESC_IDLE_US) { throttle_us = (float)FC_ESC_IDLE_US; }
-    if (throttle_us > (float)FC_ESC_MAX_US) { throttle_us = (float)FC_ESC_MAX_US; }
+    if (throttle_us > (float)FC_ESC_COMMAND_MAX_US) { throttle_us = (float)FC_ESC_COMMAND_MAX_US; }
     return (uint16_t)(throttle_us + 0.5f);
 }
 
@@ -173,6 +198,7 @@ FcStatus_t App_FlightInit(void)
     s_state = FC_STATE_STOP;
     s_mode = FC_MODE_STABILIZE;
     s_rc = (FcRcInput_t){0};
+    s_pilot = (FcPilotCommand_t){0};
     s_imu = (FcImuData_t){0};
     s_attitude = (FcAttitude_t){0};
     s_battery = (FcBatteryStatus_t){0};
@@ -183,8 +209,10 @@ FcStatus_t App_FlightInit(void)
     s_altitude_target_m = 0.0f;
     s_altitude_correction_us = 0.0f;
     Ctl_MixerSetStop(&s_motor_output);
+    g_fc_flight_debug = (AppFlightDebug_t){0};
     (void)BSP_EscPwm_StopAll();
     s_initialized = true;
+    publish_debug_snapshot();
     return FC_STATUS_OK;
 }
 
@@ -198,7 +226,8 @@ void App_FlightTask500Hz(void)
     }
     ++s_task_stats.task_500hz_count;
 
-    status = Drv_Qmi8658_Read(&s_imu);
+    (void)Drv_Bmi088_SetBiasTrackingEnabled(s_state == FC_STATE_STOP);
+    status = Drv_Bmi088_Read(&s_imu);
     if ((status != FC_STATUS_OK) || !s_imu.valid)
     {
         s_imu.valid = false;
@@ -209,6 +238,7 @@ void App_FlightTask500Hz(void)
     if (s_state != FC_STATE_RUNNING)
     {
         hold_motors_stopped();
+        publish_debug_snapshot();
         return;
     }
     if (!App_SafetyMotorOutputAllowed())
@@ -242,7 +272,9 @@ void App_FlightTask500Hz(void)
     if (BSP_EscPwm_WriteAll(&s_motor_output) != FC_STATUS_OK)
     {
         force_stop();
+        return;
     }
+    publish_debug_snapshot();
 }
 
 void App_FlightTask250Hz(void)
@@ -266,13 +298,14 @@ void App_FlightTask250Hz(void)
     if (s_state != FC_STATE_RUNNING)
     {
         s_target_rate_dps = (FcVector3f_t){0};
+        publish_debug_snapshot();
         return;
     }
 
     target.throttle_us = build_throttle_command_us();
-    target.roll_deg = ((float)s_rc.roll / (float)FC_RC_AXIS_MAX) * FC_MAX_TARGET_TILT_DEG;
-    target.pitch_deg = ((float)s_rc.pitch / (float)FC_RC_AXIS_MAX) * FC_MAX_TARGET_TILT_DEG;
-    target.yaw_rate_dps = ((float)s_rc.yaw / (float)FC_RC_AXIS_MAX) * FC_MAX_TARGET_YAW_RATE_DPS;
+    target.roll_deg = s_pilot.roll * FC_MAX_TARGET_TILT_DEG;
+    target.pitch_deg = s_pilot.pitch * FC_MAX_TARGET_TILT_DEG;
+    target.yaw_rate_dps = s_pilot.yaw * FC_MAX_TARGET_YAW_RATE_DPS;
     target.altitude_m = s_altitude_target_m;
     target.mode = s_mode;
 
@@ -280,7 +313,9 @@ void App_FlightTask250Hz(void)
     {
         s_target_rate_dps = (FcVector3f_t){0};
         force_stop();
+        return;
     }
+    publish_debug_snapshot();
 }
 
 void App_FlightTask100Hz(void)
@@ -303,6 +338,10 @@ void App_FlightTask100Hz(void)
         s_rc = (FcRcInput_t){0};
         s_rc.failsafe = true;
     }
+    if (Ctl_RcMapUpdate(&s_rc, &s_pilot) != FC_STATUS_OK)
+    {
+        s_pilot = (FcPilotCommand_t){0};
+    }
     if (BSP_BatteryAdc_Read(&s_battery, now_ms) != FC_STATUS_OK)
     {
         s_battery.valid = false;
@@ -312,7 +351,7 @@ void App_FlightTask100Hz(void)
     scheduler_ok = (App_SchedulerGetStats(&scheduler_stats) == FC_STATUS_OK) &&
                    scheduler_stats.healthy;
     App_SafetyEvaluate(&s_rc, &s_imu, &s_attitude, &s_battery, scheduler_ok);
-    if (!App_SafetyMotorOutputAllowed())
+    if (!App_SafetyMotorOutputAllowed() || !s_pilot.valid || !s_pilot.motor_safe)
     {
         force_stop();
         return;
@@ -357,6 +396,7 @@ void App_FlightTask100Hz(void)
             force_stop();
             break;
     }
+    publish_debug_snapshot();
 }
 
 void App_FlightTask50Hz(void)
@@ -409,6 +449,7 @@ void App_FlightTask10Hz(void)
         return;
     }
     ++s_task_stats.task_10hz_count;
+    publish_debug_snapshot();
     /* Reserved for bounded housekeeping and deferred log snapshots. */
 }
 
@@ -439,5 +480,33 @@ FcStatus_t App_FlightGetTaskStats(AppFlightTaskStats_t *stats)
         return FC_STATUS_INVALID_ARGUMENT;
     }
     *stats = s_task_stats;
+    return s_initialized ? FC_STATUS_OK : FC_STATUS_NOT_INITIALIZED;
+}
+
+FcStatus_t App_FlightGetDebug(AppFlightDebug_t *debug)
+{
+    uint32_t index;
+
+    if (debug == NULL)
+    {
+        return FC_STATUS_INVALID_ARGUMENT;
+    }
+
+    debug->imu = g_fc_flight_debug.imu;
+    debug->attitude = g_fc_flight_debug.attitude;
+    debug->receiver = g_fc_flight_debug.receiver;
+    debug->pilot = g_fc_flight_debug.pilot;
+    debug->motors = g_fc_flight_debug.motors;
+    debug->safety = g_fc_flight_debug.safety;
+    debug->control = g_fc_flight_debug.control;
+    debug->target_rate_dps = g_fc_flight_debug.target_rate_dps;
+    for (index = 0U; index < FC_IBUS_CHANNEL_COUNT; ++index)
+    {
+        debug->raw_channels[index] = g_fc_flight_debug.raw_channels[index];
+    }
+    debug->state = g_fc_flight_debug.state;
+    debug->mode = g_fc_flight_debug.mode;
+    debug->motor_safe = g_fc_flight_debug.motor_safe;
+    debug->publish_count = g_fc_flight_debug.publish_count;
     return s_initialized ? FC_STATUS_OK : FC_STATUS_NOT_INITIALIZED;
 }

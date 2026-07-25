@@ -31,7 +31,7 @@ static bool s_output_enabled;
 uint16_t BSP_EscPwm_ClampUs(uint16_t pulse_us)
 {
     if (pulse_us < FC_ESC_MIN_US) { return FC_ESC_MIN_US; }
-    if (pulse_us > FC_ESC_MAX_US) { return FC_ESC_MAX_US; }
+    if (pulse_us > FC_ESC_COMMAND_MAX_US) { return FC_ESC_COMMAND_MAX_US; }
     return pulse_us;
 }
 
@@ -84,7 +84,7 @@ static bool channel_period_can_fit_pulse(const EscPwmChannel_t *output)
     }
 
     period_ticks = (uint64_t)output->counter_hz / (uint64_t)FC_ESC_PWM_FRAME_HZ;
-    maximum_ccr = ((uint64_t)FC_ESC_MAX_US * (uint64_t)output->counter_hz + 999999ULL) /
+    maximum_ccr = ((uint64_t)FC_ESC_COMMAND_MAX_US * (uint64_t)output->counter_hz + 999999ULL) /
                   1000000ULL;
     return (maximum_ccr > 0U) && (period_ticks > maximum_ccr);
 }
@@ -231,6 +231,25 @@ FcStatus_t BSP_EscPwm_WriteAll(const FcMotorOutput_t *out)
     }
     s_last_command.valid = true;
     return FC_STATUS_OK;
+}
+
+FcStatus_t BSP_EscPwm_WriteTestUs(uint8_t motor_id, uint16_t pulse_us)
+{
+#if !FC_ENABLE_MOTOR_TEST
+    (void)motor_id;
+    (void)pulse_us;
+    return FC_STATUS_NOT_READY;
+#else
+    if (motor_id >= FC_MOTOR_COUNT)
+    {
+        return FC_STATUS_INVALID_ARGUMENT;
+    }
+    if (pulse_us > FC_MOTOR_TEST_MAX_US)
+    {
+        pulse_us = FC_MOTOR_TEST_MAX_US;
+    }
+    return BSP_EscPwm_WriteUs(motor_id, pulse_us);
+#endif
 }
 
 FcStatus_t BSP_EscPwm_StopAll(void)

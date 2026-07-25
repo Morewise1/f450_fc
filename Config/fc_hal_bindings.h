@@ -28,7 +28,7 @@ extern SPI_HandleTypeDef hspi1;
 extern I2C_HandleTypeDef FC_HAL_SENSOR_I2C_HANDLE;
 extern ADC_HandleTypeDef FC_HAL_BATTERY_ADC_HANDLE;
 
-#define FC_HAL_QMI8658_SPI_HANDLE hspi1
+#define FC_HAL_BMI088_SPI_HANDLE hspi1
 #endif
 
 #endif /* FC_HAL_BINDINGS_H */
