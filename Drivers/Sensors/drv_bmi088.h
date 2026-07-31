@@ -1,7 +1,7 @@
 #ifndef DRV_BMI088_H
 #define DRV_BMI088_H
 
-/* BMI088 SPI driver. Output units are g, deg/s, and degrees Celsius. */
+/* BMI088 I2C driver. Output units are g, deg/s, and degrees Celsius. */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -12,6 +12,21 @@ typedef struct
     uint8_t accel;
     uint8_t gyro;
 } Bmi088ChipIds_t;
+
+typedef struct
+{
+    uint8_t accel_address_7bit;
+    uint8_t gyro_address_7bit;
+    Bmi088ChipIds_t chip_ids;
+    FcStatus_t init_status;
+    FcStatus_t last_read_status;
+    uint32_t valid_read_count;
+    uint32_t failed_read_count;
+    bool ready;
+    bool calibrated;
+} Bmi088Debug_t;
+
+extern volatile Bmi088Debug_t g_bmi088_debug;
 
 /* Initialization contains blocking delays; the 500 Hz read path does not. */
 FcStatus_t Drv_Bmi088_Init(void);
@@ -29,5 +44,6 @@ FcStatus_t Drv_Bmi088_GetChipIds(Bmi088ChipIds_t *ids);
 bool Drv_Bmi088_IsCalibrationComplete(void);
 bool Drv_Bmi088_IsDataValid(uint32_t now_ms);
 FcStatus_t Drv_Bmi088_GetGyroBias(FcVector3f_t *bias_dps);
+FcStatus_t Drv_Bmi088_GetDebug(Bmi088Debug_t *debug);
 
 #endif /* DRV_BMI088_H */

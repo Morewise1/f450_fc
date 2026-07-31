@@ -16,7 +16,7 @@
 #error "Define FC_HAL_DEBUG_UART_HANDLE as a CubeMX UART handle"
 #endif
 #ifndef FC_HAL_SENSOR_I2C_HANDLE
-#error "Define FC_HAL_SENSOR_I2C_HANDLE as a CubeMX I2C handle"
+#define FC_HAL_SENSOR_I2C_HANDLE hi2c2
 #endif
 #ifndef FC_HAL_BATTERY_ADC_HANDLE
 #error "Define FC_HAL_BATTERY_ADC_HANDLE as a CubeMX ADC handle"
@@ -24,12 +24,11 @@
 
 extern UART_HandleTypeDef FC_HAL_IBUS_UART_HANDLE;
 extern UART_HandleTypeDef FC_HAL_DEBUG_UART_HANDLE;
-extern SPI_HandleTypeDef hspi1;
+extern I2C_HandleTypeDef hi2c2;
 extern I2C_HandleTypeDef FC_HAL_SENSOR_I2C_HANDLE;
 extern ADC_HandleTypeDef FC_HAL_BATTERY_ADC_HANDLE;
 
-#define FC_HAL_BMI088_SPI_HANDLE hspi1
+#define FC_HAL_BMI088_I2C_HANDLE FC_HAL_SENSOR_I2C_HANDLE
 #endif
 
 #endif /* FC_HAL_BINDINGS_H */
-

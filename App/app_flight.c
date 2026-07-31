@@ -109,7 +109,7 @@ static FcStatus_t reject_transition(FcStatus_t reason)
 
 static FcStatus_t transition_state(FcFlightState_t next_state)
 {
-    if ((next_state < FC_STATE_STOP) || (next_state > FC_STATE_RUNNING) ||
+    if ((next_state > FC_STATE_RUNNING) ||
         !state_transition_is_allowed(s_state, next_state))
     {
         return reject_transition(FC_STATUS_INVALID_DATA);

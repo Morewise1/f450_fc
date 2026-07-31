@@ -72,12 +72,22 @@
 #define FC_IMU_CAL_ACCEL_MAG_MAX_SQ           1.3225f
 #define FC_IMU_BIAS_TRACK_ALPHA                0.0002f
 
+/* Software filtering after body-axis mapping and gyro bias correction. */
+#define FC_IMU_ACCEL_LPF_HZ                    30.0f
+#define FC_IMU_GYRO_LPF_HZ                     80.0f
+#define FC_IMU_FILTER_MAX_DT_S                   0.02f
+
 #define FC_AHRS_MAHONY_KP                      2.0f
 #define FC_AHRS_MAHONY_KI                      0.05f
+#define FC_AHRS_INTEGRAL_LIMIT_RAD_S           0.20f
 #define FC_AHRS_ACCEL_MIN_NORM_SQ              0.25f
 #define FC_AHRS_ACCEL_MAX_NORM_SQ              2.25f
 
-#define FC_BMI088_SPI_TIMEOUT_MS               1U
+#define FC_BMI088_I2C_TIMEOUT_MS               2U
+#define FC_BMI088_ACCEL_I2C_ADDRESS_LOW      0x18U
+#define FC_BMI088_ACCEL_I2C_ADDRESS_HIGH     0x19U
+#define FC_BMI088_GYRO_I2C_ADDRESS_LOW       0x68U
+#define FC_BMI088_GYRO_I2C_ADDRESS_HIGH      0x69U
 #define FC_BMI088_STARTUP_DELAY_MS            10U
 #define FC_BMI088_ACCEL_RESET_DELAY_MS         5U
 #define FC_BMI088_ACCEL_POWER_DELAY_MS        50U

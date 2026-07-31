@@ -1,11 +1,10 @@
-/* BMI088 dual-CS SPI driver with fail-closed reads and RAM gyro bias. */
+/* BMI088 I2C driver with address probing, fail-closed reads, and RAM bias. */
 
 #include <stddef.h>
 #include "drv_bmi088.h"
 #include "fc_board.h"
 #include "fc_config.h"
 
-#define BMI088_SPI_READ_BIT                  0x80U
 #define BMI088_SOFTRESET_VALUE               0xB6U
 
 #define BMI088_ACCEL_REG_CHIP_ID             0x00U
@@ -33,12 +32,14 @@
 /* Gyro: +/-2000 dps, 1000 Hz ODR / 116 Hz bandwidth, normal mode. */
 #define BMI088_GYRO_RANGE_VALUE              0x00U
 #define BMI088_GYRO_BANDWIDTH_VALUE          0x02U
+#define BMI088_GYRO_BANDWIDTH_MASK           0x07U
 #define BMI088_GYRO_LPM1_NORMAL              0x00U
 
 #define BMI088_ACCEL_LSB_PER_G       (32768.0f / 6.0f)
 #define BMI088_GYRO_LSB_PER_DPS      (32768.0f / 2000.0f)
 #define BMI088_VECTOR_DATA_LENGTH             6U
 #define BMI088_TEMP_DATA_LENGTH               2U
+#define TWO_PI_F                              6.2831853071795864769f
 
 typedef enum
 {
@@ -54,10 +55,16 @@ typedef struct
     bool bias_tracking_enabled;
     bool last_data_valid;
     Bmi088ChipIds_t chip_ids;
+    uint8_t accel_address_7bit;
+    uint8_t gyro_address_7bit;
     uint32_t last_valid_ms;
+    uint32_t last_filter_ms;
     uint32_t calibration_count;
     FcVector3f_t gyro_bias_dps;
     FcVector3f_t gyro_sum_dps;
+    FcVector3f_t filtered_accel_g;
+    FcVector3f_t filtered_gyro_dps;
+    bool filter_initialized;
 } Bmi088State_t;
 
 typedef struct
@@ -68,10 +75,23 @@ typedef struct
 } Bmi088RawSample_t;
 
 static Bmi088State_t s_state;
+volatile Bmi088Debug_t g_bmi088_debug;
+
+static void publish_debug(void)
+{
+    g_bmi088_debug.accel_address_7bit = s_state.accel_address_7bit;
+    g_bmi088_debug.gyro_address_7bit = s_state.gyro_address_7bit;
+    g_bmi088_debug.chip_ids = s_state.chip_ids;
+    g_bmi088_debug.ready = s_state.ready;
+    g_bmi088_debug.calibrated = s_state.calibrated;
+}
 
 static void reset_driver_state(void)
 {
     s_state = (Bmi088State_t){0};
+    g_bmi088_debug = (Bmi088Debug_t){0};
+    g_bmi088_debug.init_status = FC_STATUS_NOT_INITIALIZED;
+    g_bmi088_debug.last_read_status = FC_STATUS_NOT_INITIALIZED;
 }
 
 static void invalidate_output(FcImuData_t *imu)
@@ -92,28 +112,10 @@ static int16_t make_i16(uint8_t low, uint8_t high)
     return (int16_t)(((uint16_t)high << 8U) | (uint16_t)low);
 }
 
-static void select_device(Bmi088Device_t device)
+static uint8_t device_address_7bit(Bmi088Device_t device)
 {
-    if (device == BMI088_DEVICE_ACCEL)
-    {
-        FC_BMI088_ACCEL_CS_LOW();
-    }
-    else
-    {
-        FC_BMI088_GYRO_CS_LOW();
-    }
-}
-
-static void deselect_device(Bmi088Device_t device)
-{
-    if (device == BMI088_DEVICE_ACCEL)
-    {
-        FC_BMI088_ACCEL_CS_HIGH();
-    }
-    else
-    {
-        FC_BMI088_GYRO_CS_HIGH();
-    }
+    return (device == BMI088_DEVICE_ACCEL) ?
+        s_state.accel_address_7bit : s_state.gyro_address_7bit;
 }
 
 static FcStatus_t hal_status_to_fc(HAL_StatusTypeDef status)
@@ -124,24 +126,29 @@ static FcStatus_t hal_status_to_fc(HAL_StatusTypeDef status)
     return FC_STATUS_ERROR;
 }
 
-static FcStatus_t spi_write_register(Bmi088Device_t device,
+static FcStatus_t i2c_write_register(Bmi088Device_t device,
                                      uint8_t reg,
                                      uint8_t value)
 {
-    uint8_t tx[2] = {(uint8_t)(reg & (uint8_t)~BMI088_SPI_READ_BIT), value};
+    uint8_t address = device_address_7bit(device);
     HAL_StatusTypeDef hal_status;
 
-    select_device(device);
-    hal_status = HAL_SPI_Transmit(&hspi1, tx, 2U, FC_BMI088_SPI_TIMEOUT_MS);
-    deselect_device(device);
+    if (address == 0U) { return FC_STATUS_NOT_READY; }
+    hal_status = HAL_I2C_Mem_Write(&FC_BMI088_I2C_HANDLE,
+                                  (uint16_t)address << 1U,
+                                  reg,
+                                  I2C_MEMADD_SIZE_8BIT,
+                                  &value,
+                                  1U,
+                                  FC_BMI088_I2C_TIMEOUT_MS);
     return hal_status_to_fc(hal_status);
 }
 #endif
 
-static FcStatus_t spi_read_registers(Bmi088Device_t device,
-                                    uint8_t reg,
-                                    uint8_t *data,
-                                    uint16_t length)
+static FcStatus_t i2c_read_registers(Bmi088Device_t device,
+                                     uint8_t reg,
+                                     uint8_t *data,
+                                     uint16_t length)
 {
     if ((data == NULL) || (length == 0U))
     {
@@ -153,28 +160,57 @@ static FcStatus_t spi_read_registers(Bmi088Device_t device,
     (void)reg;
     return FC_STATUS_NOT_READY;
 #else
-    uint8_t command = (uint8_t)(reg | BMI088_SPI_READ_BIT);
-    uint8_t dummy = 0U;
+    uint8_t address = device_address_7bit(device);
     HAL_StatusTypeDef hal_status;
 
-    select_device(device);
-    hal_status = HAL_SPI_Transmit(&hspi1, &command, 1U, FC_BMI088_SPI_TIMEOUT_MS);
-
-    /* The BMI088 accelerometer returns one dummy byte before register data. */
-    if ((hal_status == HAL_OK) && (device == BMI088_DEVICE_ACCEL))
-    {
-        hal_status = HAL_SPI_Receive(&hspi1, &dummy, 1U, FC_BMI088_SPI_TIMEOUT_MS);
-    }
-    if (hal_status == HAL_OK)
-    {
-        hal_status = HAL_SPI_Receive(&hspi1, data, length, FC_BMI088_SPI_TIMEOUT_MS);
-    }
-    deselect_device(device);
+    if (address == 0U) { return FC_STATUS_NOT_READY; }
+    hal_status = HAL_I2C_Mem_Read(&FC_BMI088_I2C_HANDLE,
+                                 (uint16_t)address << 1U,
+                                 reg,
+                                 I2C_MEMADD_SIZE_8BIT,
+                                 data,
+                                 length,
+                                 FC_BMI088_I2C_TIMEOUT_MS);
     return hal_status_to_fc(hal_status);
 #endif
 }
 
 #if FC_USE_STM32_HAL
+static FcStatus_t probe_device_address(Bmi088Device_t device,
+                                       uint8_t first_address,
+                                       uint8_t second_address,
+                                       uint8_t expected_chip_id)
+{
+    const uint8_t addresses[2] = {first_address, second_address};
+    uint32_t index;
+
+    for (index = 0U; index < 2U; ++index)
+    {
+        uint8_t chip_id = 0U;
+        HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&FC_BMI088_I2C_HANDLE,
+                                                    (uint16_t)addresses[index] << 1U,
+                                                    0x00U,
+                                                    I2C_MEMADD_SIZE_8BIT,
+                                                    &chip_id,
+                                                    1U,
+                                                    FC_BMI088_I2C_TIMEOUT_MS);
+        if ((status == HAL_OK) && (chip_id == expected_chip_id))
+        {
+            if (device == BMI088_DEVICE_ACCEL)
+            {
+                s_state.accel_address_7bit = addresses[index];
+            }
+            else
+            {
+                s_state.gyro_address_7bit = addresses[index];
+            }
+            publish_debug();
+            return FC_STATUS_OK;
+        }
+    }
+    return FC_STATUS_NOT_READY;
+}
+
 static bool axis_mapping_is_valid(void)
 {
     bool sources_in_range = (FC_IMU_BODY_X_SOURCE <= FC_AXIS_SOURCE_Z) &&
@@ -218,51 +254,45 @@ static int16_t map_raw_axis(const int16_t raw[3], uint32_t source, float sign)
     return (int16_t)value;
 }
 
+static FcStatus_t write_and_verify_masked(Bmi088Device_t device,
+                                          uint8_t reg,
+                                          uint8_t value,
+                                          uint8_t mask)
+{
+    uint8_t readback = 0U;
+    FcStatus_t status = i2c_write_register(device, reg, value);
+
+    if (status != FC_STATUS_OK)
+    {
+        return status;
+    }
+    status = i2c_read_registers(device, reg, &readback, 1U);
+    if (status != FC_STATUS_OK)
+    {
+        return status;
+    }
+    return ((readback & mask) == (value & mask)) ?
+        FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
 static FcStatus_t write_and_verify(Bmi088Device_t device,
                                    uint8_t reg,
                                    uint8_t value)
 {
-    uint8_t readback = 0U;
-    FcStatus_t status = spi_write_register(device, reg, value);
-
-    if (status != FC_STATUS_OK)
-    {
-        return status;
-    }
-    status = spi_read_registers(device, reg, &readback, 1U);
-    if (status != FC_STATUS_OK)
-    {
-        return status;
-    }
-    return (readback == value) ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+    return write_and_verify_masked(device, reg, value, 0xFFU);
 }
 
 static FcStatus_t reset_devices(void)
 {
-    uint8_t ignored = 0U;
     FcStatus_t status;
 
-    /* First accel read switches that die from its power-on I2C state to SPI. */
-    status = spi_read_registers(BMI088_DEVICE_ACCEL,
-                                BMI088_ACCEL_REG_CHIP_ID,
-                                &ignored,
-                                1U);
-    if (status != FC_STATUS_OK) { return status; }
-
-    status = spi_write_register(BMI088_DEVICE_ACCEL,
+    status = i2c_write_register(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_SOFTRESET,
                                 BMI088_SOFTRESET_VALUE);
     if (status != FC_STATUS_OK) { return status; }
     HAL_Delay(FC_BMI088_ACCEL_RESET_DELAY_MS);
 
-    /* Reset returns the accel interface to power-on state; select SPI again. */
-    status = spi_read_registers(BMI088_DEVICE_ACCEL,
-                                BMI088_ACCEL_REG_CHIP_ID,
-                                &ignored,
-                                1U);
-    if (status != FC_STATUS_OK) { return status; }
-
-    status = spi_write_register(BMI088_DEVICE_GYRO,
+    status = i2c_write_register(BMI088_DEVICE_GYRO,
                                 BMI088_GYRO_REG_SOFTRESET,
                                 BMI088_SOFTRESET_VALUE);
     if (status != FC_STATUS_OK) { return status; }
@@ -274,11 +304,11 @@ static FcStatus_t configure_accelerometer(void)
 {
     FcStatus_t status;
 
-    status = spi_write_register(BMI088_DEVICE_ACCEL,
+    status = i2c_write_register(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_PWR_CTRL,
                                 BMI088_ACCEL_PWR_CTRL_ENABLE);
     if (status != FC_STATUS_OK) { return status; }
-    status = spi_write_register(BMI088_DEVICE_ACCEL,
+    status = i2c_write_register(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_PWR_CONF,
                                 BMI088_ACCEL_PWR_CONF_ACTIVE);
     if (status != FC_STATUS_OK) { return status; }
@@ -313,9 +343,11 @@ static FcStatus_t configure_gyroscope(void)
                               BMI088_GYRO_REG_RANGE,
                               BMI088_GYRO_RANGE_VALUE);
     if (status != FC_STATUS_OK) { return status; }
-    return write_and_verify(BMI088_DEVICE_GYRO,
-                            BMI088_GYRO_REG_BANDWIDTH,
-                            BMI088_GYRO_BANDWIDTH_VALUE);
+    /* Bit 7 can read as 1 on BMI088; only BW[2:0] is configurable. */
+    return write_and_verify_masked(BMI088_DEVICE_GYRO,
+                                   BMI088_GYRO_REG_BANDWIDTH,
+                                   BMI088_GYRO_BANDWIDTH_VALUE,
+                                   BMI088_GYRO_BANDWIDTH_MASK);
 }
 
 static bool data_looks_like_bus_fault(const uint8_t accel[6],
@@ -350,17 +382,17 @@ static FcStatus_t read_raw_sample(Bmi088RawSample_t *raw)
     uint8_t temperature[BMI088_TEMP_DATA_LENGTH];
     FcStatus_t status;
 
-    status = spi_read_registers(BMI088_DEVICE_ACCEL,
+    status = i2c_read_registers(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_DATA_X_LSB,
                                 accel,
                                 BMI088_VECTOR_DATA_LENGTH);
     if (status != FC_STATUS_OK) { return status; }
-    status = spi_read_registers(BMI088_DEVICE_GYRO,
+    status = i2c_read_registers(BMI088_DEVICE_GYRO,
                                 BMI088_GYRO_REG_DATA_X_LSB,
                                 gyro,
                                 BMI088_VECTOR_DATA_LENGTH);
     if (status != FC_STATUS_OK) { return status; }
-    status = spi_read_registers(BMI088_DEVICE_ACCEL,
+    status = i2c_read_registers(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_TEMP_MSB,
                                 temperature,
                                 BMI088_TEMP_DATA_LENGTH);
@@ -471,6 +503,61 @@ static void update_stationary_gyro_bias(const FcVector3f_t *accel_g,
     s_state.gyro_bias_dps.y += alpha * (gyro_dps->y - s_state.gyro_bias_dps.y);
     s_state.gyro_bias_dps.z += alpha * (gyro_dps->z - s_state.gyro_bias_dps.z);
 }
+
+static float low_pass_alpha(float cutoff_hz, float dt_s)
+{
+    float omega_dt;
+
+    if ((cutoff_hz <= 0.0f) || (dt_s <= 0.0f))
+    {
+        return 1.0f;
+    }
+    omega_dt = TWO_PI_F * cutoff_hz * dt_s;
+    return omega_dt / (1.0f + omega_dt);
+}
+
+static void filter_output_sample(FcImuData_t *sample)
+{
+    float dt_s = FC_CONTROL_DT_S;
+    float accel_alpha;
+    float gyro_alpha;
+
+    if (s_state.filter_initialized)
+    {
+        uint32_t elapsed_ms = sample->timestamp_ms - s_state.last_filter_ms;
+        if (elapsed_ms > 0U)
+        {
+            dt_s = (float)elapsed_ms * 0.001f;
+        }
+        if (dt_s > FC_IMU_FILTER_MAX_DT_S)
+        {
+            s_state.filter_initialized = false;
+        }
+    }
+
+    if (!s_state.filter_initialized)
+    {
+        s_state.filtered_accel_g = sample->accel_g;
+        s_state.filtered_gyro_dps = sample->gyro_dps;
+        s_state.filter_initialized = true;
+    }
+    else
+    {
+        accel_alpha = low_pass_alpha(FC_IMU_ACCEL_LPF_HZ, dt_s);
+        gyro_alpha = low_pass_alpha(FC_IMU_GYRO_LPF_HZ, dt_s);
+
+        s_state.filtered_accel_g.x += accel_alpha * (sample->accel_g.x - s_state.filtered_accel_g.x);
+        s_state.filtered_accel_g.y += accel_alpha * (sample->accel_g.y - s_state.filtered_accel_g.y);
+        s_state.filtered_accel_g.z += accel_alpha * (sample->accel_g.z - s_state.filtered_accel_g.z);
+        s_state.filtered_gyro_dps.x += gyro_alpha * (sample->gyro_dps.x - s_state.filtered_gyro_dps.x);
+        s_state.filtered_gyro_dps.y += gyro_alpha * (sample->gyro_dps.y - s_state.filtered_gyro_dps.y);
+        s_state.filtered_gyro_dps.z += gyro_alpha * (sample->gyro_dps.z - s_state.filtered_gyro_dps.z);
+    }
+
+    s_state.last_filter_ms = sample->timestamp_ms;
+    sample->accel_g = s_state.filtered_accel_g;
+    sample->gyro_dps = s_state.filtered_gyro_dps;
+}
 #endif
 
 FcStatus_t Drv_Bmi088_ReadChipIds(Bmi088ChipIds_t *ids)
@@ -483,7 +570,7 @@ FcStatus_t Drv_Bmi088_ReadChipIds(Bmi088ChipIds_t *ids)
     }
     *ids = (Bmi088ChipIds_t){0};
 
-    status = spi_read_registers(BMI088_DEVICE_ACCEL,
+    status = i2c_read_registers(BMI088_DEVICE_ACCEL,
                                 BMI088_ACCEL_REG_CHIP_ID,
                                 &ids->accel,
                                 1U);
@@ -492,7 +579,7 @@ FcStatus_t Drv_Bmi088_ReadChipIds(Bmi088ChipIds_t *ids)
         *ids = (Bmi088ChipIds_t){0};
         return status;
     }
-    status = spi_read_registers(BMI088_DEVICE_GYRO,
+    status = i2c_read_registers(BMI088_DEVICE_GYRO,
                                 BMI088_GYRO_REG_CHIP_ID,
                                 &ids->gyro,
                                 1U);
@@ -508,31 +595,49 @@ FcStatus_t Drv_Bmi088_Init(void)
     reset_driver_state();
 
 #if !FC_USE_STM32_HAL
+    g_bmi088_debug.init_status = FC_STATUS_NOT_READY;
     return FC_STATUS_NOT_READY;
 #else
     FcStatus_t status;
 
     if (!axis_mapping_is_valid())
     {
+        g_bmi088_debug.init_status = FC_STATUS_INVALID_DATA;
         return FC_STATUS_INVALID_DATA;
     }
 
-    FC_BMI088_ACCEL_CS_HIGH();
-    FC_BMI088_GYRO_CS_HIGH();
     HAL_Delay(FC_BMI088_STARTUP_DELAY_MS);
 
-    status = reset_devices();
+    status = probe_device_address(BMI088_DEVICE_ACCEL,
+                                  FC_BMI088_ACCEL_I2C_ADDRESS_LOW,
+                                  FC_BMI088_ACCEL_I2C_ADDRESS_HIGH,
+                                  FC_BMI088_EXPECTED_ACCEL_CHIP_ID);
+    if (status == FC_STATUS_OK)
+    {
+        status = probe_device_address(BMI088_DEVICE_GYRO,
+                                      FC_BMI088_GYRO_I2C_ADDRESS_LOW,
+                                      FC_BMI088_GYRO_I2C_ADDRESS_HIGH,
+                                      FC_BMI088_EXPECTED_GYRO_CHIP_ID);
+    }
+    if (status == FC_STATUS_OK)
+    {
+        status = reset_devices();
+    }
     if (status == FC_STATUS_OK)
     {
         status = Drv_Bmi088_ReadChipIds(&s_state.chip_ids);
     }
     if (status != FC_STATUS_OK)
     {
+        g_bmi088_debug.init_status = status;
+        publish_debug();
         return status;
     }
     if ((s_state.chip_ids.accel != FC_BMI088_EXPECTED_ACCEL_CHIP_ID) ||
         (s_state.chip_ids.gyro != FC_BMI088_EXPECTED_GYRO_CHIP_ID))
     {
+        g_bmi088_debug.init_status = FC_STATUS_INVALID_DATA;
+        publish_debug();
         return FC_STATUS_INVALID_DATA;
     }
 
@@ -543,10 +648,15 @@ FcStatus_t Drv_Bmi088_Init(void)
     }
     if (status != FC_STATUS_OK)
     {
+        g_bmi088_debug.init_status = status;
+        publish_debug();
         return status;
     }
 
     s_state.ready = true;
+    g_bmi088_debug.init_status = FC_STATUS_OK;
+    g_bmi088_debug.last_read_status = FC_STATUS_NOT_READY;
+    publish_debug();
     return FC_STATUS_OK;
 #endif
 }
@@ -569,6 +679,7 @@ FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
 
     if (!s_state.ready)
     {
+        g_bmi088_debug.last_read_status = FC_STATUS_NOT_READY;
         return FC_STATUS_NOT_READY;
     }
 
@@ -576,6 +687,9 @@ FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
     if (status != FC_STATUS_OK)
     {
         s_state.last_data_valid = false;
+        g_bmi088_debug.last_read_status = status;
+        ++g_bmi088_debug.failed_read_count;
+        publish_debug();
         return status;
     }
 
@@ -584,6 +698,8 @@ FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
     if (status != FC_STATUS_OK)
     {
         s_state.last_data_valid = false;
+        g_bmi088_debug.last_read_status = status;
+        publish_debug();
         return status;
     }
 
@@ -593,12 +709,16 @@ FcStatus_t Drv_Bmi088_Read(FcImuData_t *imu)
     sample.gyro_dps.x = gyro_uncorrected_body_dps.x - s_state.gyro_bias_dps.x;
     sample.gyro_dps.y = gyro_uncorrected_body_dps.y - s_state.gyro_bias_dps.y;
     sample.gyro_dps.z = gyro_uncorrected_body_dps.z - s_state.gyro_bias_dps.z;
+    filter_output_sample(&sample);
     sample.calibrated = s_state.calibrated;
     sample.valid = true;
 
     *imu = sample;
     s_state.last_valid_ms = sample.timestamp_ms;
     s_state.last_data_valid = true;
+    g_bmi088_debug.last_read_status = FC_STATUS_OK;
+    ++g_bmi088_debug.valid_read_count;
+    publish_debug();
     return FC_STATUS_OK;
 #endif
 }
@@ -616,6 +736,11 @@ FcStatus_t Drv_Bmi088_CalibrateGyro(void)
     s_state.calibration_count = 0U;
     s_state.gyro_bias_dps = (FcVector3f_t){0};
     s_state.gyro_sum_dps = (FcVector3f_t){0};
+    s_state.filtered_accel_g = (FcVector3f_t){0};
+    s_state.filtered_gyro_dps = (FcVector3f_t){0};
+    s_state.last_filter_ms = 0U;
+    s_state.filter_initialized = false;
+    publish_debug();
     return FC_STATUS_OK;
 }
 
@@ -666,4 +791,24 @@ FcStatus_t Drv_Bmi088_GetGyroBias(FcVector3f_t *bias_dps)
     *bias_dps = s_state.gyro_bias_dps;
     if (!s_state.ready) { return FC_STATUS_NOT_READY; }
     return s_state.calibrated ? FC_STATUS_OK : FC_STATUS_BUSY;
+}
+
+FcStatus_t Drv_Bmi088_GetDebug(Bmi088Debug_t *debug)
+{
+    if (debug == NULL)
+    {
+        return FC_STATUS_INVALID_ARGUMENT;
+    }
+
+    debug->accel_address_7bit = g_bmi088_debug.accel_address_7bit;
+    debug->gyro_address_7bit = g_bmi088_debug.gyro_address_7bit;
+    debug->chip_ids.accel = g_bmi088_debug.chip_ids.accel;
+    debug->chip_ids.gyro = g_bmi088_debug.chip_ids.gyro;
+    debug->init_status = g_bmi088_debug.init_status;
+    debug->last_read_status = g_bmi088_debug.last_read_status;
+    debug->valid_read_count = g_bmi088_debug.valid_read_count;
+    debug->failed_read_count = g_bmi088_debug.failed_read_count;
+    debug->ready = g_bmi088_debug.ready;
+    debug->calibrated = g_bmi088_debug.calibrated;
+    return s_state.ready ? FC_STATUS_OK : FC_STATUS_NOT_READY;
 }

@@ -1,9 +1,9 @@
 Dependencies for Project 'F407_fc', Target 'F407_fc': (DO NOT MODIFY !)
-F (startup_stm32f407xx.s)(0x6A61C880)(--cpu Cortex-M4.fp -g --apcs=interwork -I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include--pd "__UVISION_VERSION SETA 514" --pd "_RTE_ SETA 1" --pd "STM32F40_41xxx SETA 1"--list startup_stm32f407xx.lst --xref -o f407_fc\startup_stm32f407xx.o --depend f407_fc\startup_stm32f407xx.d)
-F (../Core/Src/main.c)(0x6A61CBCC)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\main.o --omf_browse f407_fc\main.crf --depend f407_fc\main.d)
-I (../Core/Inc/main.h)(0x6A5F7CD8)
+F (startup_stm32f407xx.s)(0x6A6C682E)(--cpu Cortex-M4.fp -g --apcs=interwork -I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include--pd "__UVISION_VERSION SETA 514" --pd "_RTE_ SETA 1" --pd "STM32F40_41xxx SETA 1"--list startup_stm32f407xx.lst --xref -o f407_fc\startup_stm32f407xx.o --depend f407_fc\startup_stm32f407xx.d)
+F (../Core/Src/main.c)(0x6A6B5D3C)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\main.o --omf_browse f407_fc\main.crf --depend f407_fc\main.d)
+I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -27,13 +27,23 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Core/Src/stm32f4xx_it.c)(0x6A5F7CD7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_it.o --omf_browse f407_fc\stm32f4xx_it.crf --depend f407_fc\stm32f4xx_it.d)
-I (../Core/Inc/main.h)(0x6A5F7CD8)
+I (../App/app_main.h)(0x6A564AE0)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../App/app_scheduler.h)(0x6A5743C4)
+I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
+F (../Core/Src/stm32f4xx_it.c)(0x6A646735)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_it.o --omf_browse f407_fc\stm32f4xx_it.crf --depend f407_fc\stm32f4xx_it.d)
+I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -57,14 +67,18 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_it.h)(0x6A5F7CD7)
-F (../Core/Src/stm32f4xx_hal_msp.c)(0x6A61C87C)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_msp.o --omf_browse f407_fc\stm32f4xx_hal_msp.crf --depend f407_fc\stm32f4xx_hal_msp.d)
-I (../Core/Inc/main.h)(0x6A5F7CD8)
+I (../Core/Inc/stm32f4xx_it.h)(0x6A646735)
+F (../Core/Src/stm32f4xx_hal_msp.c)(0x6A6B5D3B)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_msp.o --omf_browse f407_fc\stm32f4xx_hal_msp.crf --depend f407_fc\stm32f4xx_hal_msp.d)
+I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -88,12 +102,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_uart.o --omf_browse f407_fc\stm32f4xx_hal_uart.crf --depend f407_fc\stm32f4xx_hal_uart.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_i2c.o --omf_browse f407_fc\stm32f4xx_hal_i2c.crf --depend f407_fc\stm32f4xx_hal_i2c.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -117,12 +135,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_rcc.o --omf_browse f407_fc\stm32f4xx_hal_rcc.crf --depend f407_fc\stm32f4xx_hal_rcc.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_i2c_ex.o --omf_browse f407_fc\stm32f4xx_hal_i2c_ex.crf --depend f407_fc\stm32f4xx_hal_i2c_ex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -146,12 +168,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_rcc_ex.o --omf_browse f407_fc\stm32f4xx_hal_rcc_ex.crf --depend f407_fc\stm32f4xx_hal_rcc_ex.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_rcc.o --omf_browse f407_fc\stm32f4xx_hal_rcc.crf --depend f407_fc\stm32f4xx_hal_rcc.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -175,12 +201,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_flash.o --omf_browse f407_fc\stm32f4xx_hal_flash.crf --depend f407_fc\stm32f4xx_hal_flash.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_rcc_ex.o --omf_browse f407_fc\stm32f4xx_hal_rcc_ex.crf --depend f407_fc\stm32f4xx_hal_rcc_ex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -204,12 +234,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_flash_ex.o --omf_browse f407_fc\stm32f4xx_hal_flash_ex.crf --depend f407_fc\stm32f4xx_hal_flash_ex.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_flash.o --omf_browse f407_fc\stm32f4xx_hal_flash.crf --depend f407_fc\stm32f4xx_hal_flash.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -233,12 +267,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_flash_ramfunc.o --omf_browse f407_fc\stm32f4xx_hal_flash_ramfunc.crf --depend f407_fc\stm32f4xx_hal_flash_ramfunc.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_flash_ex.o --omf_browse f407_fc\stm32f4xx_hal_flash_ex.crf --depend f407_fc\stm32f4xx_hal_flash_ex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -262,12 +300,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_gpio.o --omf_browse f407_fc\stm32f4xx_hal_gpio.crf --depend f407_fc\stm32f4xx_hal_gpio.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_flash_ramfunc.o --omf_browse f407_fc\stm32f4xx_hal_flash_ramfunc.crf --depend f407_fc\stm32f4xx_hal_flash_ramfunc.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -291,12 +333,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_dma_ex.o --omf_browse f407_fc\stm32f4xx_hal_dma_ex.crf --depend f407_fc\stm32f4xx_hal_dma_ex.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_gpio.o --omf_browse f407_fc\stm32f4xx_hal_gpio.crf --depend f407_fc\stm32f4xx_hal_gpio.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -320,12 +366,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_dma.o --omf_browse f407_fc\stm32f4xx_hal_dma.crf --depend f407_fc\stm32f4xx_hal_dma.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_dma_ex.o --omf_browse f407_fc\stm32f4xx_hal_dma_ex.crf --depend f407_fc\stm32f4xx_hal_dma_ex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -349,12 +399,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_pwr.o --omf_browse f407_fc\stm32f4xx_hal_pwr.crf --depend f407_fc\stm32f4xx_hal_pwr.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_dma.o --omf_browse f407_fc\stm32f4xx_hal_dma.crf --depend f407_fc\stm32f4xx_hal_dma.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -378,12 +432,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_pwr_ex.o --omf_browse f407_fc\stm32f4xx_hal_pwr_ex.crf --depend f407_fc\stm32f4xx_hal_pwr_ex.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_pwr.o --omf_browse f407_fc\stm32f4xx_hal_pwr.crf --depend f407_fc\stm32f4xx_hal_pwr.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -407,12 +465,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_cortex.o --omf_browse f407_fc\stm32f4xx_hal_cortex.crf --depend f407_fc\stm32f4xx_hal_cortex.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_pwr_ex.o --omf_browse f407_fc\stm32f4xx_hal_pwr_ex.crf --depend f407_fc\stm32f4xx_hal_pwr_ex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -436,12 +498,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal.o --omf_browse f407_fc\stm32f4xx_hal.crf --depend f407_fc\stm32f4xx_hal.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_cortex.o --omf_browse f407_fc\stm32f4xx_hal_cortex.crf --depend f407_fc\stm32f4xx_hal_cortex.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -465,12 +531,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\stm32f4xx_hal_exti.o --omf_browse f407_fc\stm32f4xx_hal_exti.crf --depend f407_fc\stm32f4xx_hal_exti.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal.o --omf_browse f407_fc\stm32f4xx_hal.crf --depend f407_fc\stm32f4xx_hal.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
@@ -494,10 +564,146 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (../Core/Src/system_stm32f4xx.c)(0x6A5CF109)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx-o f407_fc\system_stm32f4xx.o --omf_browse f407_fc\system_stm32f4xx.crf --depend f407_fc\system_stm32f4xx.d)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_exti.o --omf_browse f407_fc\stm32f4xx_hal_exti.crf --depend f407_fc\stm32f4xx_hal_exti.d)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_tim.o --omf_browse f407_fc\stm32f4xx_hal_tim.crf --depend f407_fc\stm32f4xx_hal_tim.d)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_tim_ex.o --omf_browse f407_fc\stm32f4xx_hal_tim_ex.crf --depend f407_fc\stm32f4xx_hal_tim_ex.d)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c)(0x6A5CF108)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\stm32f4xx_hal_uart.o --omf_browse f407_fc\stm32f4xx_hal_uart.crf --depend f407_fc\stm32f4xx_hal_uart.d)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (../Core/Src/system_stm32f4xx.c)(0x6A5CF109)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\system_stm32f4xx.o --omf_browse f407_fc\system_stm32f4xx.crf --depend f407_fc\system_stm32f4xx.d)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
@@ -508,7 +714,7 @@ I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
-I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A61C87D)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
@@ -523,6 +729,351 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\App\app_flight.c)(0x6A6857D3)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_flight.o --omf_browse f407_fc\app_flight.crf --depend f407_fc\app_flight.d)
+I (..\App\app_flight.h)(0x6A6324F3)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (..\App\app_safety.h)(0x6A5743CB)
+I (..\App\app_scheduler.h)(0x6A5743C4)
+I (../BSP/bsp_battery_adc.h)(0x6A564B3E)
+I (../BSP/bsp_esc_pwm.h)(0x6A6324A9)
+I (../Control/ctl_altitude.h)(0x6A564C44)
+I (../Control/ctl_attitude.h)(0x6A564C3E)
+I (../Control/ctl_mixer.h)(0x6A564C30)
+I (../Control/ctl_rc_map.h)(0x6A6323E8)
+I (../Control/ctl_rate.h)(0x6A632465)
+I (../Control/ctl_pid.h)(0x6A63245D)
+I (../Drivers/Sensors/drv_bmi088.h)(0x6A6857C9)
+I (../Drivers/Sensors/drv_bmp390.h)(0x6A564BAC)
+I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../Estimator/est_altitude.h)(0x6A564BC3)
+I (../Estimator/est_attitude.h)(0x6A6323B6)
+F (..\App\app_main.c)(0x6A6312AC)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_main.o --omf_browse f407_fc\app_main.crf --depend f407_fc\app_main.d)
+I (..\App\app_main.h)(0x6A564AE0)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (..\App\app_flight.h)(0x6A6324F3)
+I (..\App\app_safety.h)(0x6A5743CB)
+I (..\App\app_scheduler.h)(0x6A5743C4)
+I (../BSP/bsp_battery_adc.h)(0x6A564B3E)
+I (../BSP/bsp_buzzer.h)(0x6A564B37)
+I (../BSP/bsp_debug_uart.h)(0x6A564B45)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (../BSP/bsp_esc_pwm.h)(0x6A6324A9)
+I (../BSP/bsp_led.h)(0x6A564B30)
+I (../Control/ctl_altitude.h)(0x6A564C44)
+I (../Control/ctl_attitude.h)(0x6A564C3E)
+I (../Control/ctl_rate.h)(0x6A632465)
+I (../Control/ctl_pid.h)(0x6A63245D)
+I (../Drivers/Sensors/drv_bmi088.h)(0x6A6857C9)
+I (../Drivers/Sensors/drv_bmp390.h)(0x6A564BAC)
+I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
+I (../Drivers/Sensors/drv_vl53l1x.h)(0x6A564BB3)
+I (../Estimator/est_altitude.h)(0x6A564BC3)
+I (../Estimator/est_attitude.h)(0x6A6323B6)
+F (..\App\app_safety.c)(0x6A5743CF)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_safety.o --omf_browse f407_fc\app_safety.crf --depend f407_fc\app_safety.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\App\app_safety.h)(0x6A5743CB)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\App\app_scheduler.c)(0x6A5743C7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_scheduler.o --omf_browse f407_fc\app_scheduler.crf --depend f407_fc\app_scheduler.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\App\app_scheduler.h)(0x6A5743C4)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Core/Inc/main.h)(0x6A685CEE)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\BSP\bsp_battery_adc.c)(0x6A564B41)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_battery_adc.o --omf_browse f407_fc\bsp_battery_adc.crf --depend f407_fc\bsp_battery_adc.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\BSP\bsp_battery_adc.h)(0x6A564B3E)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\BSP\bsp_buzzer.c)(0x6A564B3A)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_buzzer.o --omf_browse f407_fc\bsp_buzzer.crf --depend f407_fc\bsp_buzzer.d)
+I (..\BSP\bsp_buzzer.h)(0x6A564B37)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\BSP\bsp_debug_uart.c)(0x6A564B49)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_debug_uart.o --omf_browse f407_fc\bsp_debug_uart.crf --depend f407_fc\bsp_debug_uart.d)
+I (..\BSP\bsp_debug_uart.h)(0x6A564B45)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\BSP\bsp_esc_pwm.c)(0x6A6324AC)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_esc_pwm.o --omf_browse f407_fc\bsp_esc_pwm.crf --depend f407_fc\bsp_esc_pwm.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\BSP\bsp_esc_pwm.h)(0x6A6324A9)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Config/fc_board.h)(0x6A6B1AC6)
+I (../Core/Inc/main.h)(0x6A685CEE)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\BSP\bsp_led.c)(0x6A564B34)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_led.o --omf_browse f407_fc\bsp_led.crf --depend f407_fc\bsp_led.d)
+I (..\BSP\bsp_led.h)(0x6A564B30)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Control\ctl_altitude.c)(0x6A564C49)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_altitude.o --omf_browse f407_fc\ctl_altitude.crf --depend f407_fc\ctl_altitude.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_altitude.h)(0x6A564C44)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Control\ctl_attitude.c)(0x6A564C41)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_attitude.o --omf_browse f407_fc\ctl_attitude.crf --depend f407_fc\ctl_attitude.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_attitude.h)(0x6A564C3E)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Config/fc_params.h)(0x6A6323F3)
+F (..\Control\ctl_mixer.c)(0x6A6324AE)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_mixer.o --omf_browse f407_fc\ctl_mixer.crf --depend f407_fc\ctl_mixer.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_mixer.h)(0x6A564C30)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Config/fc_board.h)(0x6A6B1AC6)
+I (../Core/Inc/main.h)(0x6A685CEE)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\Control\ctl_pid.c)(0x6A632463)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_pid.o --omf_browse f407_fc\ctl_pid.crf --depend f407_fc\ctl_pid.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_pid.h)(0x6A63245D)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Control\ctl_rate.c)(0x6A632490)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_rate.o --omf_browse f407_fc\ctl_rate.crf --depend f407_fc\ctl_rate.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_rate.h)(0x6A632465)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (..\Control\ctl_pid.h)(0x6A63245D)
+I (../Config/fc_params.h)(0x6A6323F3)
+F (..\Control\ctl_rc_map.c)(0x6A6323EA)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_rc_map.o --omf_browse f407_fc\ctl_rc_map.crf --depend f407_fc\ctl_rc_map.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Control\ctl_rc_map.h)(0x6A6323E8)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Estimator\est_altitude.c)(0x6A564BC7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_altitude.o --omf_browse f407_fc\est_altitude.crf --depend f407_fc\est_altitude.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Estimator\est_altitude.h)(0x6A564BC3)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Estimator\est_attitude.c)(0x6A6A05D4)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_attitude.o --omf_browse f407_fc\est_attitude.crf --depend f407_fc\est_attitude.d)
+I (E:\Keil_v5\ARM\ARMCC\include\math.h)(0x5475F2FE)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Estimator\est_attitude.h)(0x6A6323B6)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Drivers\Radio\drv_ibus.c)(0x6A6323ED)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_ibus.o --omf_browse f407_fc\drv_ibus.crf --depend f407_fc\drv_ibus.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Drivers\Radio\drv_ibus.h)(0x6A56D8B0)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Config/fc_params.h)(0x6A6323F3)
+I (../Core/Inc/main.h)(0x6A685CEE)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\Drivers\Sensors\drv_bmi088.c)(0x6A6A05D1)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_bmi088.o --omf_browse f407_fc\drv_bmi088.crf --depend f407_fc\drv_bmi088.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Drivers\Sensors\drv_bmi088.h)(0x6A6857C9)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (../Config/fc_config.h)(0x6A6A05CD)
+I (../Config/fc_board.h)(0x6A6B1AC6)
+I (../Core/Inc/main.h)(0x6A685CEE)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
+I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x6A5CF109)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
+F (..\Drivers\Sensors\drv_bmp390.c)(0x6A564BB0)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_bmp390.o --omf_browse f407_fc\drv_bmp390.crf --depend f407_fc\drv_bmp390.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Drivers\Sensors\drv_bmp390.h)(0x6A564BAC)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)
+F (..\Drivers\Sensors\drv_vl53l1x.c)(0x6A564BB7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_vl53l1x.o --omf_browse f407_fc\drv_vl53l1x.crf --depend f407_fc\drv_vl53l1x.d)
+I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
+I (..\Drivers\Sensors\drv_vl53l1x.h)(0x6A564BB3)
+I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
+I (../Config/fc_types.h)(0x6A632314)
+I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
+I (../Config/fc_config.h)(0x6A6A05CD)

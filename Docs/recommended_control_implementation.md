@@ -1,6 +1,6 @@
 # 推荐控制方案实现说明
 
-本文记录 BMI088、FS-iA6B、ESC、姿态解算和 PID 的第一版软件约定。当前代码已通过主机测试，但正式 CubeMX 工程尚未配置 SPI、i-BUS UART、PWM 和 1 ms 定时器，因此现在不能直接接桨飞行。
+本文记录 BMI088、FS-iA6B、ESC、姿态解算和 PID 的第一版软件约定。当前代码已通过主机测试；i-BUS UART、PWM 和 1 ms 定时器已经生成，BMI088 需要按实物模块改为 I2C2 后才能开始无桨验证。
 
 ## 已实现的数据链
 
@@ -9,7 +9,7 @@ FS-iA6B i-BUS -> drv_ibus -> FcRcInput_t
                               |
                               v
                          ctl_rc_map -> FcPilotCommand_t
-BMI088 SPI -> drv_bmi088 -> FcImuData_t -> est_attitude -> FcAttitude_t
+BMI088 I2C2 -> drv_bmi088 -> FcImuData_t -> est_attitude -> FcAttitude_t
                                               |
                                               v
                                       attitude/rate PID
@@ -82,4 +82,4 @@ Include Paths 至少加入：
 ..\Estimator
 ```
 
-CubeMX 外设配置完成前保持 `FC_USE_STM32_HAL=0U` 只能验证安全 stub；外设句柄和 `fc_board.h` 映射全部完成后才改为 `1U`。不要为了通过编译虚构 HAL 句柄。
+实物 BMI088-V1.0 使用 I2C2 PB10/PB11；原 SPI1 和双 CS 配置应从 CubeMX 删除。CubeMX 外设配置完成前保持 `FC_USE_STM32_HAL=0U` 只能验证安全 stub；外设句柄和 `fc_board.h` 映射全部完成后才改为 `1U`。不要为了通过编译虚构 HAL 句柄。
