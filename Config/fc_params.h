@@ -30,11 +30,11 @@
  * These conservative values must be tuned on the actual frame.
  */
 #define FC_RATE_ROLL_KP                 0.75f
-#define FC_RATE_ROLL_KI                 0.40f
-#define FC_RATE_ROLL_KD                 0.008f
+#define FC_RATE_ROLL_KI                 0.0f
+#define FC_RATE_ROLL_KD                 0.0f
 #define FC_RATE_PITCH_KP                0.75f
-#define FC_RATE_PITCH_KI                0.40f
-#define FC_RATE_PITCH_KD                0.008f
+#define FC_RATE_PITCH_KI                0.0f
+#define FC_RATE_PITCH_KD                0.0f
 #define FC_RATE_YAW_KP                  0.50f
 #define FC_RATE_YAW_KI                  0.20f
 #define FC_RATE_YAW_KD                  0.0f
@@ -53,7 +53,7 @@
 #define FC_PID_INTEGRAL_SEPARATION      80.0f
 #define FC_PID_VARIABLE_I_FULL_ERROR    10.0f
 #define FC_PID_VARIABLE_I_ZERO_ERROR   100.0f
-#define FC_PID_DERIVATIVE_LPF_HZ        30.0f
+#define FC_PID_DERIVATIVE_LPF_HZ        20.0f
 #define FC_PID_ENABLE_INTEGRAL_SEPARATION 1U
 #define FC_PID_ENABLE_VARIABLE_INTEGRAL   0U
 #define FC_PID_ENABLE_ANTI_WINDUP          1U

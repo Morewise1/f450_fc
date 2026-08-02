@@ -74,7 +74,7 @@
 
 /* Software filtering after body-axis mapping and gyro bias correction. */
 #define FC_IMU_ACCEL_LPF_HZ                    30.0f
-#define FC_IMU_GYRO_LPF_HZ                     80.0f
+#define FC_IMU_GYRO_LPF_HZ                     55.0f
 #define FC_IMU_FILTER_MAX_DT_S                   0.02f
 
 #define FC_AHRS_MAHONY_KP                      2.0f
