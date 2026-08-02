@@ -12,7 +12,11 @@ static CtlPid_t s_yaw_pid;
 static bool s_initialized;
 volatile CtlRateDebug_t g_ctl_rate_debug;
 
-static CtlPidConfig_t make_config(float kp, float ki, float kd, float limit)
+static CtlPidConfig_t make_config(float kp,
+                                  float ki,
+                                  float kd,
+                                  float output_limit,
+                                  float integral_limit)
 {
     CtlPidConfig_t config;
     config.kp = kp;
@@ -20,10 +24,10 @@ static CtlPidConfig_t make_config(float kp, float ki, float kd, float limit)
     config.kd = kd;
     config.output_offset = FC_PID_OUTPUT_OFFSET;
     config.input_deadband = FC_PID_INPUT_DEADBAND;
-    config.integral_min = -limit;
-    config.integral_max = limit;
-    config.output_min = -limit;
-    config.output_max = limit;
+    config.integral_min = -integral_limit;
+    config.integral_max = integral_limit;
+    config.output_min = -output_limit;
+    config.output_max = output_limit;
     config.integral_separation_threshold = FC_PID_INTEGRAL_SEPARATION;
     config.variable_integral_full_error = FC_PID_VARIABLE_I_FULL_ERROR;
     config.variable_integral_zero_error = FC_PID_VARIABLE_I_ZERO_ERROR;
@@ -38,9 +42,21 @@ static CtlPidConfig_t make_config(float kp, float ki, float kd, float limit)
 
 FcStatus_t Ctl_RateInit(void)
 {
-    CtlPidConfig_t roll = make_config(FC_RATE_ROLL_KP, FC_RATE_ROLL_KI, FC_RATE_ROLL_KD, FC_MIXER_ROLL_LIMIT_US);
-    CtlPidConfig_t pitch = make_config(FC_RATE_PITCH_KP, FC_RATE_PITCH_KI, FC_RATE_PITCH_KD, FC_MIXER_PITCH_LIMIT_US);
-    CtlPidConfig_t yaw = make_config(FC_RATE_YAW_KP, FC_RATE_YAW_KI, FC_RATE_YAW_KD, FC_MIXER_YAW_LIMIT_US);
+    CtlPidConfig_t roll = make_config(FC_RATE_ROLL_KP,
+                                      FC_RATE_ROLL_KI,
+                                      FC_RATE_ROLL_KD,
+                                      FC_MIXER_ROLL_LIMIT_US,
+                                      FC_RATE_ROLL_I_LIMIT_US);
+    CtlPidConfig_t pitch = make_config(FC_RATE_PITCH_KP,
+                                       FC_RATE_PITCH_KI,
+                                       FC_RATE_PITCH_KD,
+                                       FC_MIXER_PITCH_LIMIT_US,
+                                       FC_RATE_PITCH_I_LIMIT_US);
+    CtlPidConfig_t yaw = make_config(FC_RATE_YAW_KP,
+                                     FC_RATE_YAW_KI,
+                                     FC_RATE_YAW_KD,
+                                     FC_MIXER_YAW_LIMIT_US,
+                                     FC_RATE_YAW_I_LIMIT_US);
 
     if ((Ctl_PidInit(&s_roll_pid, &roll) != FC_STATUS_OK) ||
         (Ctl_PidInit(&s_pitch_pid, &pitch) != FC_STATUS_OK) ||

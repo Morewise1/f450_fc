@@ -46,7 +46,9 @@ FcStatus_t App_MainInit(void)
 
     (void)BSP_Led_Init();
     (void)BSP_Buzzer_Init();
+#if FC_ENABLE_BATTERY_MONITOR
     record_failure(BSP_BatteryAdc_Init());
+#endif
     (void)BSP_DebugUart_Init();
 
     record_failure(Drv_Ibus_Init());

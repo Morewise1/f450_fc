@@ -27,8 +27,12 @@ static void set_fail_closed_defaults(void)
     s_status = (FcSafetyStatus_t){0};
     s_status.active_faults = FC_SAFETY_FAULT_RC_LOST |
                              FC_SAFETY_FAULT_IMU_INVALID |
-                             FC_SAFETY_FAULT_BATTERY_UNKNOWN |
                              FC_SAFETY_FAULT_INITIALIZATION;
+#if FC_ENABLE_BATTERY_MONITOR
+    s_status.active_faults |= FC_SAFETY_FAULT_BATTERY_UNKNOWN;
+#else
+    s_status.battery_ok = true;
+#endif
     s_status.arm_conditions_met = false;
     s_status.motor_output_allowed = false;
 }
@@ -77,7 +81,12 @@ void App_SafetyEvaluate(const FcRcInput_t *rc,
     s_status.rc_online = rc_input_is_sane(rc);
     s_status.imu_ready = (imu != NULL) && imu->valid;
     s_status.imu_calibrated = (imu != NULL) && imu->calibrated;
+#if FC_ENABLE_BATTERY_MONITOR
     s_status.battery_ok = (battery != NULL) && battery->valid && !battery->critical;
+#else
+    (void)battery;
+    s_status.battery_ok = true;
+#endif
     s_status.tilt_ok = (attitude != NULL) && attitude->valid &&
                        (absolute_float(attitude->roll_deg) <= FC_SAFETY_MAX_TILT_DEG) &&
                        (absolute_float(attitude->pitch_deg) <= FC_SAFETY_MAX_TILT_DEG);
@@ -85,8 +94,10 @@ void App_SafetyEvaluate(const FcRcInput_t *rc,
 
     if (!s_status.rc_online) { faults |= FC_SAFETY_FAULT_RC_LOST; }
     if (!s_status.imu_ready || !s_status.imu_calibrated) { faults |= FC_SAFETY_FAULT_IMU_INVALID; }
+#if FC_ENABLE_BATTERY_MONITOR
     if ((battery == NULL) || !battery->valid) { faults |= FC_SAFETY_FAULT_BATTERY_UNKNOWN; }
     else if (battery->critical) { faults |= FC_SAFETY_FAULT_BATTERY_CRITICAL; }
+#endif
     if (!s_status.tilt_ok) { faults |= FC_SAFETY_FAULT_EXCESSIVE_TILT; }
     if (!scheduler_ok) { faults |= FC_SAFETY_FAULT_SCHEDULER; }
     if ((rc == NULL) || !rc->arm_switch || !rc->safety_switch) { faults |= FC_SAFETY_FAULT_ARM_SWITCH; }

@@ -1,4 +1,4 @@
-/* Minimal bounded proportional outer loop; gains remain zero until tuning. */
+/* Bounded proportional attitude outer loop feeding the rate PID. */
 
 #include <stddef.h>
 #include "ctl_attitude.h"
@@ -44,4 +44,3 @@ FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,
 void Ctl_AttitudeReset(void)
 {
 }
-

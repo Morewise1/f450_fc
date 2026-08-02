@@ -104,9 +104,16 @@
 #define FC_MIXER_PITCH_LIMIT_US            400.0f
 #define FC_MIXER_YAW_LIMIT_US              300.0f
 
+#ifndef FC_ENABLE_BATTERY_MONITOR
+#define FC_ENABLE_BATTERY_MONITOR             0U
+#endif
 #define FC_BATTERY_CELL_COUNT                3U
 #define FC_BATTERY_WARNING_PER_CELL_V        3.50f
 #define FC_BATTERY_CRITICAL_PER_CELL_V       3.30f
+
+#if FC_ENABLE_BATTERY_MONITOR > 1U
+#error "FC_ENABLE_BATTERY_MONITOR must be 0 or 1"
+#endif
 
 #if (FC_SCHEDULER_TICK_HZ == 0U) || (FC_CONTROL_RATE_HZ == 0U) || \
     (FC_ATTITUDE_RATE_HZ == 0U) || (FC_RC_UPDATE_RATE_HZ == 0U) || \

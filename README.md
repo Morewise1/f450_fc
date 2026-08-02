@@ -14,7 +14,7 @@
 - App 通过独立输出许可控制解锁，BSP 不解释飞行状态。
 - 未解锁、初始化失败、传感器无效和急停时保持四路 1000 us。
 - BMI088 支持双芯片 ID、物理单位换算、轴映射和非阻塞陀螺校准。
-- BMP390、VL53L1X、电池 ADC 和调试 UART 仍为安全 stub。
+- BMP390、VL53L1X、电池 ADC 和调试 UART 仍为 stub；首飞配置默认关闭电池监测。
 - ALT_HOLD 只有状态机和接口，当前不能进行实机定高飞行。
 - 不包含 FreeRTOS、光流、GPS 或磁力计逻辑。
 
@@ -33,6 +33,7 @@ ctest --test-dir build --output-on-failure
 - i-BUS 解析及无硬件安全状态。
 - BMI088 fake-HAL、双 CS、轴映射、校准和通信错误。
 - ESC fake-HAL、多定时器不同计数频率、1000/1500/2000 us 和启动失败回收。
+- 遥控杆、姿态外环、角速度 PID 和 Quad-X 四电机差速的端到端方向。
 
 ## CubeMX/HAL 集成
 
@@ -58,6 +59,7 @@ ctest --test-dir build --output-on-failure
 4. 输出许可关闭时，大于 1000 us 的命令会被拒绝。
 5. 非法 motor ID 不写任何 CCR。
 6. `StopAll()` 将四路写回 1000 us，并关闭输出许可。
-7. 传感器无效、遥控失联、电池未知、调度异常或 IMU 未校准时禁止解锁。
+7. 传感器无效、遥控失联、调度异常或 IMU 未校准时禁止解锁；启用电池监测后，电池未知同样禁止解锁。
+8. `FC_ENABLE_BATTERY_MONITOR=0` 仅用于没有 ADC 硬件的首飞配置，必须使用外部低压告警并限制飞行时间。
 
 三人分工与 PR 规则见 [Docs/team_workflow.md](Docs/team_workflow.md)。

@@ -116,6 +116,8 @@ extern TIM_HandleTypeDef FC_ESC_M4_TIM_HANDLE;
 #define FC_MOTOR_INDEX_M3                     2U
 #define FC_MOTOR_INDEX_M4                     3U
 
+/* Viewed from above, nose forward: M1 front-right, M2 rear-right,
+ * M3 rear-left, M4 front-left. Verify this against the real wiring. */
 #define FC_MOTOR_SPIN_CW                       0U
 #define FC_MOTOR_SPIN_CCW                      1U
 #define FC_MOTOR_M1_SPIN             FC_MOTOR_SPIN_CCW

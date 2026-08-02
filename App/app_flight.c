@@ -342,11 +342,16 @@ void App_FlightTask100Hz(void)
     {
         s_pilot = (FcPilotCommand_t){0};
     }
+#if FC_ENABLE_BATTERY_MONITOR
     if (BSP_BatteryAdc_Read(&s_battery, now_ms) != FC_STATUS_OK)
     {
         s_battery.valid = false;
         s_battery.critical = true;
     }
+#else
+    s_battery = (FcBatteryStatus_t){0};
+    s_battery.timestamp_ms = now_ms;
+#endif
 
     scheduler_ok = (App_SchedulerGetStats(&scheduler_stats) == FC_STATUS_OK) &&
                    scheduler_stats.healthy;

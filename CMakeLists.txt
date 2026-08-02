@@ -69,6 +69,15 @@ target_include_directories(app_flight_state_machine_test PRIVATE
     Drivers/Sensors
     Estimator
 )
+target_compile_definitions(app_flight_state_machine_test PRIVATE
+    FC_ENABLE_BATTERY_MONITOR=1
+)
+
+add_executable(app_safety_no_battery_test
+    App/app_safety.c
+    Tests/app_safety_no_battery_test.c
+)
+target_include_directories(app_safety_no_battery_test PRIVATE App Config)
 
 add_executable(bmi088_driver_test
     Drivers/Sensors/drv_bmi088.c
@@ -111,6 +120,16 @@ add_executable(pid_test
     Tests/pid_test.c
 )
 target_include_directories(pid_test PRIVATE Config Control)
+
+add_executable(control_pipeline_test
+    Control/ctl_attitude.c
+    Control/ctl_mixer.c
+    Control/ctl_pid.c
+    Control/ctl_rate.c
+    Control/ctl_rc_map.c
+    Tests/control_pipeline_test.c
+)
+target_include_directories(control_pipeline_test PRIVATE Config Control)
 target_include_directories(esc_pwm_driver_test PRIVATE
     Tests/fake_hal
     BSP
@@ -128,11 +147,13 @@ target_compile_definitions(esc_pwm_driver_test PRIVATE
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(app_scheduler_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(app_flight_state_machine_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(app_safety_no_battery_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(bmi088_driver_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(esc_pwm_driver_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(attitude_estimator_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(rc_map_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(pid_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(control_pipeline_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_link_libraries(attitude_estimator_test PRIVATE m)
 endif()
 
@@ -140,8 +161,10 @@ enable_testing()
 add_test(NAME fc_stub_smoke COMMAND fc_stub_smoke)
 add_test(NAME app_scheduler_test COMMAND app_scheduler_test)
 add_test(NAME app_flight_state_machine_test COMMAND app_flight_state_machine_test)
+add_test(NAME app_safety_no_battery_test COMMAND app_safety_no_battery_test)
 add_test(NAME bmi088_driver_test COMMAND bmi088_driver_test)
 add_test(NAME esc_pwm_driver_test COMMAND esc_pwm_driver_test)
 add_test(NAME attitude_estimator_test COMMAND attitude_estimator_test)
 add_test(NAME rc_map_test COMMAND rc_map_test)
 add_test(NAME pid_test COMMAND pid_test)
+add_test(NAME control_pipeline_test COMMAND control_pipeline_test)
