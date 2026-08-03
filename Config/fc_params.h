@@ -41,6 +41,7 @@
 
 #define FC_ATTITUDE_ROLL_KP             4.0f
 #define FC_ATTITUDE_PITCH_KP            4.0f
+#define FC_ATTITUDE_ANGLE_DEADBAND_DEG   0.5f
 
 /* I-term limits are deliberately lower than the total mixer authority. */
 #define FC_RATE_ROLL_I_LIMIT_US        100.0f

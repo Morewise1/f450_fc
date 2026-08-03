@@ -15,11 +15,19 @@ typedef struct
     float q2;
     float q3;
     FcVector3f_t integral_feedback;
+    FcVector3f_t level_accel_sum;
+    float level_q0;
+    float level_q1;
+    float level_q2;
+    float level_q3;
+    uint32_t level_sample_count;
     bool initialized;
     bool aligned;
+    bool level_calibrated;
 } AttitudeEstimatorState_t;
 
 static AttitudeEstimatorState_t s_state;
+volatile EstAttitudeDebug_t g_est_attitude_debug;
 
 static float clamp_float(float value, float minimum, float maximum)
 {
@@ -32,10 +40,16 @@ static void reset_state(void)
 {
     s_state = (AttitudeEstimatorState_t){0};
     s_state.q0 = 1.0f;
+    s_state.level_q0 = 1.0f;
     s_state.initialized = true;
+    g_est_attitude_debug = (EstAttitudeDebug_t){0};
 }
 
-static bool align_from_accelerometer(const FcVector3f_t *accel_g)
+static bool quaternion_from_accelerometer(const FcVector3f_t *accel_g,
+                                          float *q0,
+                                          float *q1,
+                                          float *q2,
+                                          float *q3)
 {
     float norm_sq = (accel_g->x * accel_g->x) +
                     (accel_g->y * accel_g->y) +
@@ -74,10 +88,24 @@ static bool align_from_accelerometer(const FcVector3f_t *accel_g)
     sin_pitch = sinf(half_pitch);
 
     /* ZYX quaternion with yaw deliberately initialized to zero. */
-    s_state.q0 = cos_roll * cos_pitch;
-    s_state.q1 = sin_roll * cos_pitch;
-    s_state.q2 = cos_roll * sin_pitch;
-    s_state.q3 = -sin_roll * sin_pitch;
+    *q0 = cos_roll * cos_pitch;
+    *q1 = sin_roll * cos_pitch;
+    *q2 = cos_roll * sin_pitch;
+    *q3 = -sin_roll * sin_pitch;
+    return true;
+}
+
+static bool align_from_accelerometer(const FcVector3f_t *accel_g)
+{
+    if (!quaternion_from_accelerometer(accel_g,
+                                       &s_state.q0,
+                                       &s_state.q1,
+                                       &s_state.q2,
+                                       &s_state.q3))
+    {
+        return false;
+    }
+
     s_state.integral_feedback = (FcVector3f_t){0};
     s_state.aligned = true;
     return true;
@@ -190,25 +218,123 @@ static bool integrate_quaternion(const FcVector3f_t *gyro_rad_s, float dt_s)
     return true;
 }
 
-static void quaternion_to_euler(FcAttitude_t *attitude)
+static void quaternion_to_euler(float q0,
+                                float q1,
+                                float q2,
+                                float q3,
+                                FcAttitude_t *attitude)
 {
-    float sin_pitch = 2.0f * ((s_state.q0 * s_state.q2) -
-                              (s_state.q3 * s_state.q1));
+    float sin_pitch = 2.0f * ((q0 * q2) - (q3 * q1));
 
-    attitude->roll_deg = atan2f(2.0f * ((s_state.q0 * s_state.q1) +
-                                        (s_state.q2 * s_state.q3)),
-                                1.0f - (2.0f * ((s_state.q1 * s_state.q1) +
-                                                (s_state.q2 * s_state.q2)))) * RAD_TO_DEG;
+    attitude->roll_deg = atan2f(2.0f * ((q0 * q1) + (q2 * q3)),
+                                1.0f - (2.0f * ((q1 * q1) + (q2 * q2)))) * RAD_TO_DEG;
     attitude->pitch_deg = asinf(clamp_float(sin_pitch, -1.0f, 1.0f)) * RAD_TO_DEG;
-    attitude->yaw_deg = atan2f(2.0f * ((s_state.q0 * s_state.q3) +
-                                       (s_state.q1 * s_state.q2)),
-                               1.0f - (2.0f * ((s_state.q2 * s_state.q2) +
-                                               (s_state.q3 * s_state.q3)))) * RAD_TO_DEG;
+    attitude->yaw_deg = atan2f(2.0f * ((q0 * q3) + (q1 * q2)),
+                               1.0f - (2.0f * ((q2 * q2) + (q3 * q3)))) * RAD_TO_DEG;
+}
+
+static bool sample_is_stationary(const FcImuData_t *imu)
+{
+    float accel_norm_sq = (imu->accel_g.x * imu->accel_g.x) +
+                          (imu->accel_g.y * imu->accel_g.y) +
+                          (imu->accel_g.z * imu->accel_g.z);
+
+    return (fabsf(imu->gyro_dps.x) <= FC_ATTITUDE_LEVEL_CAL_MAX_GYRO_DPS) &&
+           (fabsf(imu->gyro_dps.y) <= FC_ATTITUDE_LEVEL_CAL_MAX_GYRO_DPS) &&
+           (fabsf(imu->gyro_dps.z) <= FC_ATTITUDE_LEVEL_CAL_MAX_GYRO_DPS) &&
+           (accel_norm_sq >= FC_ATTITUDE_LEVEL_CAL_ACCEL_MIN_SQ) &&
+           (accel_norm_sq <= FC_ATTITUDE_LEVEL_CAL_ACCEL_MAX_SQ);
+}
+
+static void reset_level_accumulator(void)
+{
+    s_state.level_accel_sum = (FcVector3f_t){0};
+    s_state.level_sample_count = 0U;
+    g_est_attitude_debug.level_sample_count = 0U;
+}
+
+static bool update_level_reference(const FcImuData_t *imu,
+                                   const FcAttitude_t *raw_attitude)
+{
+    FcVector3f_t mean_accel;
+    FcAttitude_t reference_attitude = {0};
+
+    if (!sample_is_stationary(imu) ||
+        (fabsf(raw_attitude->roll_deg) > FC_ATTITUDE_LEVEL_MAX_TRIM_DEG) ||
+        (fabsf(raw_attitude->pitch_deg) > FC_ATTITUDE_LEVEL_MAX_TRIM_DEG))
+    {
+        reset_level_accumulator();
+        return false;
+    }
+
+    s_state.level_accel_sum.x += imu->accel_g.x;
+    s_state.level_accel_sum.y += imu->accel_g.y;
+    s_state.level_accel_sum.z += imu->accel_g.z;
+    ++s_state.level_sample_count;
+    g_est_attitude_debug.level_sample_count = s_state.level_sample_count;
+
+    if (s_state.level_sample_count < FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT)
+    {
+        return false;
+    }
+
+    mean_accel.x = s_state.level_accel_sum.x / (float)s_state.level_sample_count;
+    mean_accel.y = s_state.level_accel_sum.y / (float)s_state.level_sample_count;
+    mean_accel.z = s_state.level_accel_sum.z / (float)s_state.level_sample_count;
+    if (!quaternion_from_accelerometer(&mean_accel,
+                                       &s_state.level_q0,
+                                       &s_state.level_q1,
+                                       &s_state.level_q2,
+                                       &s_state.level_q3))
+    {
+        reset_level_accumulator();
+        return false;
+    }
+
+    /* Restart the running estimate from the averaged gravity direction. */
+    s_state.q0 = s_state.level_q0;
+    s_state.q1 = s_state.level_q1;
+    s_state.q2 = s_state.level_q2;
+    s_state.q3 = s_state.level_q3;
+    s_state.integral_feedback = (FcVector3f_t){0};
+    s_state.level_calibrated = true;
+    quaternion_to_euler(s_state.level_q0,
+                        s_state.level_q1,
+                        s_state.level_q2,
+                        s_state.level_q3,
+                        &reference_attitude);
+    g_est_attitude_debug.level_roll_trim_deg = reference_attitude.roll_deg;
+    g_est_attitude_debug.level_pitch_trim_deg = reference_attitude.pitch_deg;
+    g_est_attitude_debug.level_calibrated = true;
+    return true;
+}
+
+static void relative_attitude_to_euler(FcAttitude_t *attitude)
+{
+    float q0 = (s_state.level_q0 * s_state.q0) +
+               (s_state.level_q1 * s_state.q1) +
+               (s_state.level_q2 * s_state.q2) +
+               (s_state.level_q3 * s_state.q3);
+    float q1 = (s_state.level_q0 * s_state.q1) -
+               (s_state.level_q1 * s_state.q0) -
+               (s_state.level_q2 * s_state.q3) +
+               (s_state.level_q3 * s_state.q2);
+    float q2 = (s_state.level_q0 * s_state.q2) +
+               (s_state.level_q1 * s_state.q3) -
+               (s_state.level_q2 * s_state.q0) -
+               (s_state.level_q3 * s_state.q1);
+    float q3 = (s_state.level_q0 * s_state.q3) -
+               (s_state.level_q1 * s_state.q2) +
+               (s_state.level_q2 * s_state.q1) -
+               (s_state.level_q3 * s_state.q0);
+
+    quaternion_to_euler(q0, q1, q2, q3, attitude);
 }
 
 FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *attitude)
 {
     FcVector3f_t gyro_rad_s;
+    FcAttitude_t raw_attitude = {0};
 
     if ((imu == NULL) || (attitude == NULL) || (dt_s <= 0.0f) || (dt_s > 0.1f))
     {
@@ -229,6 +355,7 @@ FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *
     {
         return FC_STATUS_INVALID_DATA;
     }
+    g_est_attitude_debug.aligned = s_state.aligned;
 
     gyro_rad_s.x = imu->gyro_dps.x * DEG_TO_RAD;
     gyro_rad_s.y = imu->gyro_dps.y * DEG_TO_RAD;
@@ -240,7 +367,13 @@ FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *
         return FC_STATUS_INVALID_DATA;
     }
 
-    quaternion_to_euler(attitude);
+    quaternion_to_euler(s_state.q0, s_state.q1, s_state.q2, s_state.q3, &raw_attitude);
+    if (!s_state.level_calibrated && !update_level_reference(imu, &raw_attitude))
+    {
+        return FC_STATUS_BUSY;
+    }
+
+    relative_attitude_to_euler(attitude);
     attitude->valid = true;
     return FC_STATUS_OK;
 }

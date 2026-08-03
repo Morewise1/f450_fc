@@ -99,9 +99,10 @@ add_executable(esc_pwm_driver_test
 
 add_executable(attitude_estimator_test
     Estimator/est_attitude.c
+    Control/ctl_attitude.c
     Tests/attitude_estimator_test.c
 )
-target_include_directories(attitude_estimator_test PRIVATE Config Estimator)
+target_include_directories(attitude_estimator_test PRIVATE Config Control Estimator)
 
 add_executable(rc_map_test
     Control/ctl_rc_map.c

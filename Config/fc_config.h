@@ -83,6 +83,13 @@
 #define FC_AHRS_ACCEL_MIN_NORM_SQ              0.25f
 #define FC_AHRS_ACCEL_MAX_NORM_SQ              2.25f
 
+/* Establish the take-off surface as zero while the aircraft is stationary. */
+#define FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT       250U
+#define FC_ATTITUDE_LEVEL_CAL_MAX_GYRO_DPS         1.5f
+#define FC_ATTITUDE_LEVEL_CAL_ACCEL_MIN_SQ          0.81f
+#define FC_ATTITUDE_LEVEL_CAL_ACCEL_MAX_SQ          1.21f
+#define FC_ATTITUDE_LEVEL_MAX_TRIM_DEG              12.0f
+
 #define FC_BMI088_I2C_TIMEOUT_MS               2U
 #define FC_BMI088_ACCEL_I2C_ADDRESS_LOW      0x18U
 #define FC_BMI088_ACCEL_I2C_ADDRESS_HIGH     0x19U
@@ -113,6 +120,10 @@
 
 #if FC_ENABLE_BATTERY_MONITOR > 1U
 #error "FC_ENABLE_BATTERY_MONITOR must be 0 or 1"
+#endif
+
+#if FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT == 0U
+#error "FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT must be non-zero"
 #endif
 
 #if (FC_SCHEDULER_TICK_HZ == 0U) || (FC_CONTROL_RATE_HZ == 0U) || \

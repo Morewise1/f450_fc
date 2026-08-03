@@ -14,6 +14,13 @@ static float clamp_float(float value, float limit)
     return value;
 }
 
+static float apply_continuous_deadband(float error, float deadband)
+{
+    if (error > deadband) { return error - deadband; }
+    if (error < -deadband) { return error + deadband; }
+    return 0.0f;
+}
+
 FcStatus_t Ctl_AttitudeInit(void)
 {
     s_initialized = true;
@@ -33,9 +40,13 @@ FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,
     if (!s_initialized) { return FC_STATUS_NOT_INITIALIZED; }
     if (!attitude->valid) { return FC_STATUS_INVALID_DATA; }
 
-    target_rate_dps->x = clamp_float((target->roll_deg - attitude->roll_deg) * FC_ATTITUDE_ROLL_KP,
+    target_rate_dps->x = clamp_float(apply_continuous_deadband(target->roll_deg - attitude->roll_deg,
+                                                               FC_ATTITUDE_ANGLE_DEADBAND_DEG) *
+                                     FC_ATTITUDE_ROLL_KP,
                                      FC_MAX_TARGET_RATE_DPS);
-    target_rate_dps->y = clamp_float((target->pitch_deg - attitude->pitch_deg) * FC_ATTITUDE_PITCH_KP,
+    target_rate_dps->y = clamp_float(apply_continuous_deadband(target->pitch_deg - attitude->pitch_deg,
+                                                               FC_ATTITUDE_ANGLE_DEADBAND_DEG) *
+                                     FC_ATTITUDE_PITCH_KP,
                                      FC_MAX_TARGET_RATE_DPS);
     target_rate_dps->z = clamp_float(target->yaw_rate_dps, FC_MAX_TARGET_YAW_RATE_DPS);
     return FC_STATUS_OK;
