@@ -103,13 +103,13 @@
 #define FC_BMI088_EXPECTED_GYRO_CHIP_ID      0x0FU
 
 #define FC_MAX_TARGET_TILT_DEG             25.0f
-#define FC_MAX_TARGET_YAW_RATE_DPS        180.0f
+#define FC_MAX_TARGET_YAW_RATE_DPS        120.0f
 #define FC_MAX_TARGET_RATE_DPS            250.0f
 #define FC_SAFETY_MAX_TILT_DEG             60.0f
 
 #define FC_MIXER_ROLL_LIMIT_US             400.0f
 #define FC_MIXER_PITCH_LIMIT_US            400.0f
-#define FC_MIXER_YAW_LIMIT_US              300.0f
+#define FC_MIXER_YAW_LIMIT_US              120.0f
 
 #ifndef FC_ENABLE_BATTERY_MONITOR
 #define FC_ENABLE_BATTERY_MONITOR             0U

@@ -142,9 +142,12 @@ static bool decode_and_commit(uint32_t timestamp_ms)
     mode_raw = clamp_u16(channels[FC_IBUS_CHANNEL_MODE], FC_IBUS_RAW_MIN, FC_IBUS_RAW_MAX);
 
     decoded = (FcRcInput_t){0};
-    decoded.roll = clamp_axis(((int32_t)roll_raw - FC_IBUS_RAW_CENTER) * FC_RC_ROLL_SIGN);
-    decoded.pitch = clamp_axis(((int32_t)pitch_raw - FC_IBUS_RAW_CENTER) * FC_RC_PITCH_SIGN);
-    decoded.yaw = clamp_axis(((int32_t)yaw_raw - FC_IBUS_RAW_CENTER) * FC_RC_YAW_SIGN);
+    decoded.roll = clamp_axis(((int32_t)roll_raw - (int32_t)FC_IBUS_RAW_CENTER) *
+                              (int32_t)FC_RC_ROLL_SIGN);
+    decoded.pitch = clamp_axis(((int32_t)pitch_raw - (int32_t)FC_IBUS_RAW_CENTER) *
+                               (int32_t)FC_RC_PITCH_SIGN);
+    decoded.yaw = clamp_axis(((int32_t)yaw_raw - (int32_t)FC_IBUS_RAW_CENTER) *
+                             (int32_t)FC_RC_YAW_SIGN);
     decoded.throttle = clamp_throttle((int32_t)throttle_raw - FC_IBUS_RAW_MIN);
     decoded.throttle_low = decoded.throttle <= FC_RC_THROTTLE_ARM_MAX;
     decoded.arm_switch = decode_switch(arm_raw, FC_IBUS_ARM_ACTIVE_HIGH);

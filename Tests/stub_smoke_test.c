@@ -5,7 +5,9 @@
 #include "app_main.h"
 #include "app_scheduler.h"
 #include "bsp_esc_pwm.h"
+#include "ctl_mixer.h"
 #include "drv_ibus.h"
+#include "fc_board.h"
 #include "fc_config.h"
 #include "fc_params.h"
 
@@ -75,12 +77,18 @@ int main(void)
     FcStatus_t init_status;
     FcMotorOutput_t flight_output;
     FcMotorOutput_t esc_output;
+    FcMotorOutput_t mixer_output;
     AppFlightTaskStats_t task_stats;
     FcRcInput_t rc_input;
     DrvIbusStats_t ibus_stats;
     uint16_t raw_channels[FC_IBUS_CHANNEL_COUNT];
     uint8_t ibus_frame[FC_IBUS_FRAME_LENGTH];
     uint32_t millisecond;
+    uint32_t throttle_test;
+    uint32_t motor;
+    int32_t roll_test;
+    int32_t pitch_test;
+    int32_t yaw_test;
 
     init_status = App_MainInit();
     if ((init_status == FC_STATUS_OK) || (init_status == FC_STATUS_NOT_INITIALIZED)) { return 1; }
@@ -106,7 +114,7 @@ int main(void)
     build_ibus_frame(ibus_frame);
     if (Drv_Ibus_ProcessBuffer(ibus_frame, FC_IBUS_FRAME_LENGTH, 100U) != 1U) { return 13; }
     if (Drv_Ibus_GetInput(&rc_input) != FC_STATUS_OK) { return 14; }
-    if ((rc_input.roll != 500) || (rc_input.pitch != -500) ||
+    if ((rc_input.roll != 500) || (rc_input.pitch != 500) ||
         (rc_input.yaw != 500) || (rc_input.throttle != 0U)) { return 15; }
     if (!rc_input.throttle_low || rc_input.arm_switch || !rc_input.mode_switch) { return 16; }
     if (rc_input.safety_switch) { return 17; }
@@ -142,5 +150,73 @@ int main(void)
         (ibus_stats.range_error_count != 1U) ||
         (ibus_stats.sync_reset_count != 1U) ||
         (ibus_stats.timeout_count != 1U)) { return 29; }
+
+    if (Ctl_MixerQuadX(1500U, 0.0f, 0.0f, 1000.0f, &mixer_output) != FC_STATUS_OK)
+    {
+        return 30;
+    }
+    if ((mixer_output.motor_us[FC_MOTOR_INDEX_M1] != 1620U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M2] != 1380U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M3] != 1620U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M4] != 1380U)) { return 31; }
+
+    /* Low-throttle pitch authority is scaled instead of raising collective thrust. */
+    if (Ctl_MixerQuadX(1200U, 0.0f, 300.0f, 0.0f, &mixer_output) != FC_STATUS_OK)
+    {
+        return 32;
+    }
+    if ((mixer_output.motor_us[FC_MOTOR_INDEX_M1] != 1300U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M2] != FC_ESC_IDLE_US) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M3] != FC_ESC_IDLE_US) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M4] != 1300U)) { return 33; }
+
+    /* Roll/pitch retains priority; yaw is reduced to the remaining motor headroom. */
+    if (Ctl_MixerQuadX(1500U, 400.0f, 400.0f, 150.0f, &mixer_output) != FC_STATUS_OK)
+    {
+        return 34;
+    }
+    if ((mixer_output.motor_us[FC_MOTOR_INDEX_M1] != 1500U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M2] != FC_ESC_IDLE_US) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M3] != 1500U) ||
+        (mixer_output.motor_us[FC_MOTOR_INDEX_M4] != 1900U) ||
+        (g_ctl_mixer_debug.yaw_scale != 0.0f) || !g_ctl_mixer_debug.saturated) { return 35; }
+
+    if (Ctl_MixerQuadX(FC_ESC_MIN_US, 0.0f, 0.0f, 0.0f, &mixer_output) !=
+        FC_STATUS_INVALID_DATA) { return 36; }
+
+    for (throttle_test = FC_ESC_IDLE_US;
+         throttle_test <= FC_ESC_COMMAND_MAX_US;
+         throttle_test += 100U)
+    {
+        for (roll_test = -400; roll_test <= 400; roll_test += 200)
+        {
+            for (pitch_test = -400; pitch_test <= 400; pitch_test += 200)
+            {
+                for (yaw_test = -300; yaw_test <= 300; yaw_test += 150)
+                {
+                    uint32_t motor_sum = 0U;
+                    int32_t average_error;
+
+                    if (Ctl_MixerQuadX((uint16_t)throttle_test,
+                                       (float)roll_test,
+                                       (float)pitch_test,
+                                       (float)yaw_test,
+                                       &mixer_output) != FC_STATUS_OK) { return 37; }
+                    for (motor = 0U; motor < FC_MOTOR_COUNT; ++motor)
+                    {
+                        if ((mixer_output.motor_us[motor] < FC_ESC_IDLE_US) ||
+                            (mixer_output.motor_us[motor] > FC_ESC_COMMAND_MAX_US)) { return 38; }
+                        motor_sum += mixer_output.motor_us[motor];
+                    }
+                    average_error = (int32_t)motor_sum - (int32_t)(4U * throttle_test);
+                    if ((average_error < -2) || (average_error > 2)) { return 39; }
+                    if ((g_ctl_mixer_debug.roll_pitch_scale < 0.0f) ||
+                        (g_ctl_mixer_debug.roll_pitch_scale > 1.0f) ||
+                        (g_ctl_mixer_debug.yaw_scale < 0.0f) ||
+                        (g_ctl_mixer_debug.yaw_scale > 1.0f)) { return 40; }
+                }
+            }
+        }
+    }
     return 0;
 }

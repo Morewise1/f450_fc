@@ -20,7 +20,7 @@
 #define FC_IBUS_RAW_VALID_MAX         2250U
 
 #define FC_RC_ROLL_SIGN                 1
-#define FC_RC_PITCH_SIGN                1
+#define FC_RC_PITCH_SIGN              (-1)
 #define FC_RC_YAW_SIGN                  1
 
 /*
