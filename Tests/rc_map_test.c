@@ -14,6 +14,8 @@ int main(void)
     FcRcInput_t input = {0};
     FcPilotCommand_t command = {0};
     float previous;
+    float normalized_mid;
+    float expected_mid;
     uint16_t throttle;
 
     if (Ctl_RcMapUpdate(NULL, &command) != FC_STATUS_INVALID_ARGUMENT) { return 1; }
@@ -52,8 +54,20 @@ int main(void)
         previous = command.throttle;
     }
 
+    input.throttle = 500U;
+    if (Ctl_RcMapUpdate(&input, &command) != FC_STATUS_OK) { return 10; }
+    normalized_mid = (500.0f - (float)FC_RC_THROTTLE_DEADBAND) /
+                     ((float)FC_RC_THROTTLE_MAX - (float)FC_RC_THROTTLE_DEADBAND);
+#if FC_THROTTLE_CURVE_MODE == FC_THROTTLE_CURVE_MODE_LINEAR
+    expected_mid = normalized_mid;
+#else
+    expected_mid = ((1.0f - FC_RC_THROTTLE_EXPO) * normalized_mid) +
+                   (FC_RC_THROTTLE_EXPO * normalized_mid * normalized_mid);
+#endif
+    if (!nearly_equal(command.throttle, expected_mid, 0.0001f)) { return 11; }
+
     input.failsafe = true;
-    if (Ctl_RcMapUpdate(&input, &command) != FC_STATUS_INVALID_DATA) { return 10; }
-    if (command.valid || command.motor_safe || command.throttle != 0.0f) { return 11; }
+    if (Ctl_RcMapUpdate(&input, &command) != FC_STATUS_INVALID_DATA) { return 12; }
+    if (command.valid || command.motor_safe || command.throttle != 0.0f) { return 13; }
     return 0;
 }

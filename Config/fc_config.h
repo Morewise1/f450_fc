@@ -59,6 +59,12 @@
 #define FC_RC_THROTTLE_EXPO                 0.30f
 #define FC_RC_MAX_CLIMB_RATE_MPS             2.0f
 
+#define FC_THROTTLE_CURVE_MODE_LINEAR         0U
+#define FC_THROTTLE_CURVE_MODE_EXPO           1U
+#ifndef FC_THROTTLE_CURVE_MODE
+#define FC_THROTTLE_CURVE_MODE FC_THROTTLE_CURVE_MODE_LINEAR
+#endif
+
 #define FC_IBUS_FRAME_LENGTH                32U
 #define FC_IBUS_CHANNEL_COUNT               14U
 #define FC_IBUS_LENGTH_BYTE               0x20U
@@ -107,6 +113,12 @@
 #define FC_MAX_TARGET_RATE_DPS            250.0f
 #define FC_SAFETY_MAX_TILT_DEG             60.0f
 
+#define FC_YAW_CONTROL_MODE_RATE             0U
+#define FC_YAW_CONTROL_MODE_HEADING_HOLD     1U
+#ifndef FC_YAW_CONTROL_MODE
+#define FC_YAW_CONTROL_MODE FC_YAW_CONTROL_MODE_HEADING_HOLD
+#endif
+
 #define FC_MIXER_ROLL_LIMIT_US             400.0f
 #define FC_MIXER_PITCH_LIMIT_US            400.0f
 #define FC_MIXER_YAW_LIMIT_US              120.0f
@@ -124,6 +136,16 @@
 
 #if FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT == 0U
 #error "FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT must be non-zero"
+#endif
+
+#if (FC_THROTTLE_CURVE_MODE != FC_THROTTLE_CURVE_MODE_LINEAR) && \
+    (FC_THROTTLE_CURVE_MODE != FC_THROTTLE_CURVE_MODE_EXPO)
+#error "FC_THROTTLE_CURVE_MODE is invalid"
+#endif
+
+#if (FC_YAW_CONTROL_MODE != FC_YAW_CONTROL_MODE_RATE) && \
+    (FC_YAW_CONTROL_MODE != FC_YAW_CONTROL_MODE_HEADING_HOLD)
+#error "FC_YAW_CONTROL_MODE is invalid"
 #endif
 
 #if (FC_SCHEDULER_TICK_HZ == 0U) || (FC_CONTROL_RATE_HZ == 0U) || \

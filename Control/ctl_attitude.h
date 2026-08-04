@@ -5,6 +5,16 @@
 
 #include "fc_types.h"
 
+typedef struct
+{
+    float yaw_target_deg;
+    float yaw_error_deg;
+    bool yaw_target_initialized;
+    bool heading_hold_enabled;
+} CtlAttitudeDebug_t;
+
+extern volatile CtlAttitudeDebug_t g_ctl_attitude_debug;
+
 FcStatus_t Ctl_AttitudeInit(void);
 FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,
                               const FcAttitude_t *attitude,
@@ -13,4 +23,3 @@ FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,
 void Ctl_AttitudeReset(void);
 
 #endif /* CTL_ATTITUDE_H */
-

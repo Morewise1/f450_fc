@@ -34,7 +34,9 @@ static float map_axis(int16_t value)
 static float map_throttle(uint16_t value)
 {
     float normalized;
+#if FC_THROTTLE_CURVE_MODE == FC_THROTTLE_CURVE_MODE_EXPO
     float expo;
+#endif
 
     if (value <= FC_RC_THROTTLE_DEADBAND)
     {
@@ -44,10 +46,15 @@ static float map_throttle(uint16_t value)
     normalized = ((float)value - (float)FC_RC_THROTTLE_DEADBAND) /
                  ((float)FC_RC_THROTTLE_MAX - (float)FC_RC_THROTTLE_DEADBAND);
     normalized = clamp_float(normalized, 0.0f, 1.0f);
+
+#if FC_THROTTLE_CURVE_MODE == FC_THROTTLE_CURVE_MODE_LINEAR
+    return normalized;
+#else
     expo = clamp_float(FC_RC_THROTTLE_EXPO, 0.0f, 1.0f);
 
     /* Quadratic blend keeps endpoints exact and softens low-throttle response. */
     return ((1.0f - expo) * normalized) + (expo * normalized * normalized);
+#endif
 }
 
 FcStatus_t Ctl_RcMapUpdate(const FcRcInput_t *input, FcPilotCommand_t *command)
