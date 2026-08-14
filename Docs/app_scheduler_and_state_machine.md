@@ -93,7 +93,7 @@ app_flight RUNNING --> PID/mixer --> FcMotorOutput_t --> bsp_esc_pwm
 | `drv_qmi8658` | 500 Hz | 本帧无效，立即 STOP |
 | `bsp_battery_adc` | 100 Hz | unknown/critical，STOP |
 | `est_attitude` | 250 Hz | 姿态无效，STOP |
-| `drv_bmp390`、`est_altitude` | 50 Hz | STABILIZE 禁用高度修正；ALT_HOLD 下 STOP |
+| `drv_bmp388`、`est_altitude` | 50 Hz | STABILIZE 禁用高度修正；ALT_HOLD 下 STOP |
 | `bsp_esc_pwm` | 状态转换、500 Hz | STOP/READY 1000 us；写入失败 STOP |
 
 ## 串口日志建议

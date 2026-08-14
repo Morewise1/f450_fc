@@ -108,6 +108,115 @@
 #define FC_BMI088_EXPECTED_ACCEL_CHIP_ID     0x1EU
 #define FC_BMI088_EXPECTED_GYRO_CHIP_ID      0x0FU
 
+#define FC_SENSOR_I2C_TIMEOUT_MS                2U
+#define FC_BMP388_I2C_ADDRESS_LOW             0x76U
+#define FC_BMP388_I2C_ADDRESS_HIGH            0x77U
+#define FC_BMP388_EXPECTED_CHIP_ID             0x50U
+#define FC_BMP388_STARTUP_DELAY_MS               10U
+#define FC_BMP388_RESET_DELAY_MS                 10U
+#define FC_MMC5983MA_I2C_ADDRESS               0x30U
+#define FC_MMC5983MA_EXPECTED_PRODUCT_ID        0x30U
+#define FC_MMC5983MA_STARTUP_DELAY_MS             10U
+#define FC_MMC5983MA_RESET_DELAY_MS               10U
+#define FC_MMC5983MA_SET_DELAY_MS                  1U
+
+/*
+ * MMC5983MA module orientation.  The default assumes sensor X points to the
+ * aircraft nose, Y points right, and Z points down.  Change only these macros
+ * after checking the actual breakout-board axis arrows.
+ */
+#define FC_MAG_BODY_X_SOURCE                        0U
+#define FC_MAG_BODY_Y_SOURCE                        1U
+#define FC_MAG_BODY_Z_SOURCE                        2U
+#define FC_MAG_BODY_X_SIGN                         1.0f
+#define FC_MAG_BODY_Y_SIGN                         1.0f
+#define FC_MAG_BODY_Z_SIGN                         1.0f
+#define FC_MAG_OFFSET_X_UT                         0.0f
+#define FC_MAG_OFFSET_Y_UT                         0.0f
+#define FC_MAG_OFFSET_Z_UT                         0.0f
+#define FC_MAG_SCALE_X                             1.0f
+#define FC_MAG_SCALE_Y                             1.0f
+#define FC_MAG_SCALE_Z                             1.0f
+#define FC_MAG_VALID_MIN_FIELD_UT                 15.0f
+#define FC_MAG_VALID_MAX_FIELD_UT                100.0f
+#define FC_MAG_CAL_MIN_SAMPLES                    300U
+#define FC_MAG_CAL_MIN_AXIS_SPAN_UT               20.0f
+
+/*
+ * Keep magnetic yaw correction disabled until axis direction, full-rotation
+ * calibration, and motor-current interference have been verified on hardware.
+ * The fusion implementation is present; set this to 1U only after those tests.
+ */
+#ifndef FC_ENABLE_MAG_YAW_FUSION
+#define FC_ENABLE_MAG_YAW_FUSION                    0U
+#endif
+#define FC_MAG_YAW_KP                               0.8f
+#define FC_MAG_YAW_MAX_CORRECTION_DPS              20.0f
+#define FC_MAG_DATA_TIMEOUT_MS                     100U
+
+/*
+ * BMP388 pressure-filter profile.  This changes only the barometer path;
+ * BMI088 and MMC5983MA filtering remain untouched.
+ *
+ * FAST:
+ *   BMP388 IIR coefficient 1, 8 Hz software pressure LPF, 5 Hz velocity LPF.
+ *   Lowest delay; use for bench response checks or a well-shielded barometer.
+ * BALANCED (recommended default):
+ *   BMP388 IIR coefficient 3, 5 Hz pressure LPF, 3 Hz velocity LPF.
+ *   Best starting compromise for a small F450 with moderate propeller wash.
+ * STRONG:
+ *   BMP388 IIR coefficient 7, 3 Hz pressure LPF, 2 Hz velocity LPF.
+ *   Use when altitude visibly jitters; it is smoother but reacts later.
+ *
+ * Change FC_BARO_FILTER_MODE, rebuild the whole Keil project, and re-flash.
+ */
+#define FC_BARO_FILTER_MODE_FAST                   0U
+#define FC_BARO_FILTER_MODE_BALANCED               1U
+#define FC_BARO_FILTER_MODE_STRONG                 2U
+#ifndef FC_BARO_FILTER_MODE
+#define FC_BARO_FILTER_MODE FC_BARO_FILTER_MODE_BALANCED
+#endif
+
+#if FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_FAST
+#define FC_BMP388_IIR_REGISTER_VALUE             0x02U
+#define FC_BARO_PRESSURE_LPF_HZ                    8.0f
+#define FC_BARO_VELOCITY_LPF_HZ                    5.0f
+#elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_BALANCED
+#define FC_BMP388_IIR_REGISTER_VALUE             0x04U
+#define FC_BARO_PRESSURE_LPF_HZ                    5.0f
+#define FC_BARO_VELOCITY_LPF_HZ                    3.0f
+#elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_STRONG
+#define FC_BMP388_IIR_REGISTER_VALUE             0x06U
+#define FC_BARO_PRESSURE_LPF_HZ                    3.0f
+#define FC_BARO_VELOCITY_LPF_HZ                    2.0f
+#else
+#error "FC_BARO_FILTER_MODE must be FAST, BALANCED, or STRONG"
+#endif
+
+/* BMP388 + BMI088 relative-altitude estimator and conservative controller. */
+#define FC_BARO_REFERENCE_SAMPLE_COUNT             100U
+#define FC_BARO_MAX_SAMPLE_STEP_M                    1.5f
+#define FC_BARO_INNOVATION_LIMIT_M                   2.0f
+#define FC_VERTICAL_BARO_POSITION_BLEND              0.10f
+#define FC_VERTICAL_BARO_VELOCITY_BLEND              0.08f
+#define FC_VERTICAL_ACCEL_MIN_NORM_SQ                 0.36f
+#define FC_VERTICAL_ACCEL_MAX_NORM_SQ                 2.89f
+#define FC_VERTICAL_ACCEL_LIMIT_MPS2                 12.0f
+#define FC_VERTICAL_MAX_PREDICT_DT_S                  0.02f
+/* A shaky aircraft may bridge short pressure dropouts for 0.4 s using inertia. */
+#define FC_BARO_INERTIAL_HOLD_TIMEOUT_MS             400U
+#define FC_GRAVITY_MPS2                          9.80665f
+#define FC_ALTITUDE_POSITION_KP                     1.0f
+#define FC_ALTITUDE_VELOCITY_KP                    90.0f
+#define FC_ALTITUDE_VELOCITY_KI                    25.0f
+#define FC_ALTITUDE_VELOCITY_I_LIMIT_US           100.0f
+#define FC_ALTITUDE_CORRECTION_LIMIT_US           220.0f
+#define FC_ALTITUDE_ERROR_DEADBAND_M                0.05f
+#define FC_ALTITUDE_MAX_VERTICAL_SPEED_MPS          0.8f
+#define FC_ALTITUDE_STICK_DEADBAND                   0.06f
+#define FC_ALTITUDE_MIN_TARGET_M                     0.10f
+#define FC_ALTITUDE_MAX_TARGET_M                     8.0f
+
 #define FC_MAX_TARGET_TILT_DEG             25.0f
 #define FC_MAX_TARGET_YAW_RATE_DPS        120.0f
 #define FC_MAX_TARGET_RATE_DPS            250.0f
@@ -132,6 +241,18 @@
 
 #if FC_ENABLE_BATTERY_MONITOR > 1U
 #error "FC_ENABLE_BATTERY_MONITOR must be 0 or 1"
+#endif
+
+#if FC_ENABLE_MAG_YAW_FUSION > 1U
+#error "FC_ENABLE_MAG_YAW_FUSION must be 0 or 1"
+#endif
+
+#if (FC_MAG_BODY_X_SOURCE > 2U) || (FC_MAG_BODY_Y_SOURCE > 2U) || \
+    (FC_MAG_BODY_Z_SOURCE > 2U) || \
+    (FC_MAG_BODY_X_SOURCE == FC_MAG_BODY_Y_SOURCE) || \
+    (FC_MAG_BODY_X_SOURCE == FC_MAG_BODY_Z_SOURCE) || \
+    (FC_MAG_BODY_Y_SOURCE == FC_MAG_BODY_Z_SOURCE)
+#error "Magnetometer body-axis mapping must be a permutation of X, Y, and Z"
 #endif
 
 #if FC_ATTITUDE_LEVEL_CAL_SAMPLE_COUNT == 0U

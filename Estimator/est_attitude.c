@@ -1,4 +1,4 @@
-/* Six-axis Mahony attitude estimator. Yaw remains gyro-relative without a magnetometer. */
+/* Mahony attitude estimator with optional, bounded magnetic yaw correction. */
 
 #include <math.h>
 #include <stddef.h>
@@ -21,13 +21,22 @@ typedef struct
     float level_q2;
     float level_q3;
     uint32_t level_sample_count;
+    FcMagnetometerData_t magnetometer;
+    float magnetic_yaw_offset_deg;
     bool initialized;
     bool aligned;
     bool level_calibrated;
+    bool magnetic_heading_initialized;
 } AttitudeEstimatorState_t;
 
 static AttitudeEstimatorState_t s_state;
 volatile EstAttitudeDebug_t g_est_attitude_debug;
+
+static void quaternion_to_euler(float q0,
+                                float q1,
+                                float q2,
+                                float q3,
+                                FcAttitude_t *attitude);
 
 static float clamp_float(float value, float minimum, float maximum)
 {
@@ -35,6 +44,15 @@ static float clamp_float(float value, float minimum, float maximum)
     if (value > maximum) { return maximum; }
     return value;
 }
+
+#if FC_ENABLE_MAG_YAW_FUSION
+static float wrap_degrees(float angle_deg)
+{
+    while (angle_deg > 180.0f) { angle_deg -= 360.0f; }
+    while (angle_deg < -180.0f) { angle_deg += 360.0f; }
+    return angle_deg;
+}
+#endif
 
 static void reset_state(void)
 {
@@ -115,6 +133,81 @@ FcStatus_t Est_AttitudeInit(void)
 {
     reset_state();
     return FC_STATUS_OK;
+}
+
+FcStatus_t Est_AttitudeSetMagnetometer(const FcMagnetometerData_t *magnetometer)
+{
+    if (magnetometer == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    if (!s_state.initialized) { return FC_STATUS_NOT_INITIALIZED; }
+    if (!magnetometer->valid || magnetometer->overflow)
+    {
+        ++g_est_attitude_debug.magnetic_reject_count;
+        return FC_STATUS_INVALID_DATA;
+    }
+    s_state.magnetometer = *magnetometer;
+    return FC_STATUS_OK;
+}
+
+static bool apply_magnetic_yaw_feedback(uint32_t timestamp_ms,
+                                        FcVector3f_t *gyro_rad_s)
+{
+#if !FC_ENABLE_MAG_YAW_FUSION
+    (void)timestamp_ms;
+    (void)gyro_rad_s;
+    g_est_attitude_debug.magnetic_aiding_active = false;
+    return false;
+#else
+    FcAttitude_t raw_attitude = {0};
+    float roll_rad;
+    float pitch_rad;
+    float horizontal_x;
+    float horizontal_y;
+    float magnetic_heading_deg;
+    float desired_yaw_deg;
+    float yaw_error_deg;
+    float correction_dps;
+
+    if (!s_state.level_calibrated || !s_state.magnetometer.valid ||
+        ((timestamp_ms - s_state.magnetometer.timestamp_ms) > FC_MAG_DATA_TIMEOUT_MS))
+    {
+        g_est_attitude_debug.magnetic_aiding_active = false;
+        return false;
+    }
+
+    quaternion_to_euler(s_state.q0, s_state.q1, s_state.q2, s_state.q3, &raw_attitude);
+    roll_rad = raw_attitude.roll_deg * DEG_TO_RAD;
+    pitch_rad = raw_attitude.pitch_deg * DEG_TO_RAD;
+    horizontal_x = (s_state.magnetometer.magnetic_ut.x * cosf(pitch_rad)) +
+                   (s_state.magnetometer.magnetic_ut.y * sinf(roll_rad) * sinf(pitch_rad)) +
+                   (s_state.magnetometer.magnetic_ut.z * cosf(roll_rad) * sinf(pitch_rad));
+    horizontal_y = (s_state.magnetometer.magnetic_ut.y * cosf(roll_rad)) -
+                   (s_state.magnetometer.magnetic_ut.z * sinf(roll_rad));
+    if (((horizontal_x * horizontal_x) + (horizontal_y * horizontal_y)) < 1.0f)
+    {
+        ++g_est_attitude_debug.magnetic_reject_count;
+        g_est_attitude_debug.magnetic_aiding_active = false;
+        return false;
+    }
+
+    magnetic_heading_deg = atan2f(-horizontal_y, horizontal_x) * RAD_TO_DEG;
+    if (!s_state.magnetic_heading_initialized)
+    {
+        s_state.magnetic_yaw_offset_deg = wrap_degrees(magnetic_heading_deg -
+                                                       raw_attitude.yaw_deg);
+        s_state.magnetic_heading_initialized = true;
+    }
+    desired_yaw_deg = wrap_degrees(magnetic_heading_deg - s_state.magnetic_yaw_offset_deg);
+    yaw_error_deg = wrap_degrees(desired_yaw_deg - raw_attitude.yaw_deg);
+    correction_dps = clamp_float(yaw_error_deg * FC_MAG_YAW_KP,
+                                 -FC_MAG_YAW_MAX_CORRECTION_DPS,
+                                 FC_MAG_YAW_MAX_CORRECTION_DPS);
+    gyro_rad_s->z += correction_dps * DEG_TO_RAD;
+    g_est_attitude_debug.magnetic_heading_deg = magnetic_heading_deg;
+    g_est_attitude_debug.magnetic_yaw_error_deg = yaw_error_deg;
+    g_est_attitude_debug.magnetic_heading_initialized = true;
+    g_est_attitude_debug.magnetic_aiding_active = true;
+    return true;
+#endif
 }
 
 static bool apply_accel_feedback(const FcVector3f_t *accel_g,
@@ -361,6 +454,7 @@ FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *
     gyro_rad_s.y = imu->gyro_dps.y * DEG_TO_RAD;
     gyro_rad_s.z = imu->gyro_dps.z * DEG_TO_RAD;
     (void)apply_accel_feedback(&imu->accel_g, dt_s, &gyro_rad_s);
+    (void)apply_magnetic_yaw_feedback(imu->timestamp_ms, &gyro_rad_s);
 
     if (!integrate_quaternion(&gyro_rad_s, dt_s))
     {

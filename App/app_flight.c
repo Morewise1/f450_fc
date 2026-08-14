@@ -11,10 +11,12 @@
 #include "ctl_rc_map.h"
 #include "ctl_rate.h"
 #include "drv_bmi088.h"
-#include "drv_bmp390.h"
+#include "drv_bmp388.h"
 #include "drv_ibus.h"
+#include "drv_mmc5983ma.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
+#include "est_inertial_nav.h"
 #include "fc_config.h"
 
 static FcFlightState_t s_state;
@@ -23,6 +25,8 @@ static FcRcInput_t s_rc;
 static FcPilotCommand_t s_pilot;
 static FcImuData_t s_imu;
 static FcAttitude_t s_attitude;
+static FcBarometerData_t s_barometer;
+static FcMagnetometerData_t s_magnetometer;
 static FcBatteryStatus_t s_battery;
 static FcAltitude_t s_altitude;
 static FcVector3f_t s_target_rate_dps;
@@ -31,8 +35,21 @@ static FcMotorOutput_t s_motor_output;
 static AppFlightTaskStats_t s_task_stats;
 static float s_altitude_target_m;
 static float s_altitude_correction_us;
+static float s_altitude_hold_stick_center;
+static uint16_t s_altitude_hold_base_throttle_us;
 static bool s_initialized;
+static bool s_altitude_hold_fault_latched;
 volatile AppFlightDebug_t g_fc_flight_debug;
+
+static uint16_t build_manual_throttle_command_us(void)
+{
+    float command_span = (float)(FC_ESC_COMMAND_MAX_US - FC_ESC_MIN_US);
+    float throttle_us = (float)FC_ESC_MIN_US + (s_pilot.throttle * command_span);
+
+    if (throttle_us < (float)FC_ESC_IDLE_US) { throttle_us = (float)FC_ESC_IDLE_US; }
+    if (throttle_us > (float)FC_ESC_COMMAND_MAX_US) { throttle_us = (float)FC_ESC_COMMAND_MAX_US; }
+    return (uint16_t)(throttle_us + 0.5f);
+}
 
 static void publish_debug_snapshot(void)
 {
@@ -40,6 +57,9 @@ static void publish_debug_snapshot(void)
 
     snapshot.imu = s_imu;
     snapshot.attitude = s_attitude;
+    snapshot.barometer = s_barometer;
+    snapshot.magnetometer = s_magnetometer;
+    snapshot.altitude = s_altitude;
     snapshot.receiver = s_rc;
     snapshot.pilot = s_pilot;
     snapshot.motors = s_motor_output;
@@ -68,6 +88,8 @@ static void reset_control_pids(void)
     s_target_rate_dps = (FcVector3f_t){0};
     s_control_output = (FcControlOutput_t){0};
     s_altitude_correction_us = 0.0f;
+    s_altitude_hold_stick_center = 0.0f;
+    s_altitude_hold_base_throttle_us = FC_ESC_IDLE_US;
 }
 
 static bool state_transition_is_allowed(FcFlightState_t current,
@@ -166,26 +188,32 @@ static FcStatus_t change_mode(FcFlightMode_t next_mode)
     }
 
     reset_control_pids();
-    s_mode = next_mode;
     if (next_mode == FC_MODE_ALT_HOLD)
     {
         s_altitude_target_m = s_altitude.altitude_m;
+        s_altitude_hold_stick_center = s_pilot.throttle;
+        s_altitude_hold_base_throttle_us = build_manual_throttle_command_us();
     }
     else
     {
         s_altitude_target_m = 0.0f;
     }
+    s_mode = next_mode;
     return FC_STATUS_OK;
 }
 
 static uint16_t build_throttle_command_us(void)
 {
-    float command_span = (float)(FC_ESC_COMMAND_MAX_US - FC_ESC_MIN_US);
-    float throttle_us = (float)FC_ESC_MIN_US + (s_pilot.throttle * command_span);
+    float throttle_us;
 
     if (s_mode == FC_MODE_ALT_HOLD)
     {
-        throttle_us += s_altitude_correction_us;
+        throttle_us = (float)s_altitude_hold_base_throttle_us +
+                      s_altitude_correction_us;
+    }
+    else
+    {
+        throttle_us = (float)build_manual_throttle_command_us();
     }
     if (throttle_us < (float)FC_ESC_IDLE_US) { throttle_us = (float)FC_ESC_IDLE_US; }
     if (throttle_us > (float)FC_ESC_COMMAND_MAX_US) { throttle_us = (float)FC_ESC_COMMAND_MAX_US; }
@@ -195,12 +223,15 @@ static uint16_t build_throttle_command_us(void)
 FcStatus_t App_FlightInit(void)
 {
     s_initialized = false;
+    s_altitude_hold_fault_latched = false;
     s_state = FC_STATE_STOP;
     s_mode = FC_MODE_STABILIZE;
     s_rc = (FcRcInput_t){0};
     s_pilot = (FcPilotCommand_t){0};
     s_imu = (FcImuData_t){0};
     s_attitude = (FcAttitude_t){0};
+    s_barometer = (FcBarometerData_t){0};
+    s_magnetometer = (FcMagnetometerData_t){0};
     s_battery = (FcBatteryStatus_t){0};
     s_altitude = (FcAltitude_t){0};
     s_target_rate_dps = (FcVector3f_t){0};
@@ -208,6 +239,8 @@ FcStatus_t App_FlightInit(void)
     s_task_stats = (AppFlightTaskStats_t){0};
     s_altitude_target_m = 0.0f;
     s_altitude_correction_us = 0.0f;
+    s_altitude_hold_stick_center = 0.0f;
+    s_altitude_hold_base_throttle_us = FC_ESC_IDLE_US;
     Ctl_MixerSetStop(&s_motor_output);
     g_fc_flight_debug = (AppFlightDebug_t){0};
     (void)BSP_EscPwm_StopAll();
@@ -234,6 +267,12 @@ void App_FlightTask500Hz(void)
         force_stop();
         return;
     }
+
+    /* Diagnostic only: this estimate is never read by a controller. */
+    (void)Est_InertialNavUpdate(&s_imu,
+                                &s_attitude,
+                                s_state != FC_STATE_RUNNING,
+                                FC_CONTROL_DT_S);
 
     if (s_state != FC_STATE_RUNNING)
     {
@@ -362,7 +401,12 @@ void App_FlightTask100Hz(void)
         return;
     }
 
-    requested_mode = s_rc.mode_switch ? FC_MODE_ALT_HOLD : FC_MODE_STABILIZE;
+    /* Pulling the switch low acknowledges an altitude-hold sensor fault. */
+    if (!s_rc.mode_switch) { s_altitude_hold_fault_latched = false; }
+    /* Altitude hold may only be entered after take-off with a valid estimate. */
+    requested_mode = (s_rc.mode_switch && !s_altitude_hold_fault_latched &&
+                      (s_state == FC_STATE_RUNNING) && s_altitude.valid) ?
+                     FC_MODE_ALT_HOLD : FC_MODE_STABILIZE;
     if (change_mode(requested_mode) != FC_STATUS_OK)
     {
         force_stop();
@@ -406,7 +450,6 @@ void App_FlightTask100Hz(void)
 
 void App_FlightTask50Hz(void)
 {
-    FcBarometerData_t barometer = {0};
     FcStatus_t barometer_status;
     FcStatus_t estimator_status;
 
@@ -416,29 +459,60 @@ void App_FlightTask50Hz(void)
     }
     ++s_task_stats.task_50hz_count;
 
-    barometer_status = Drv_Bmp390_Read(&barometer, App_SchedulerGetTickMs());
-    estimator_status = Est_AltitudeUpdate(&barometer, NULL, FC_ALTITUDE_DT_S, &s_altitude);
-    if ((barometer_status != FC_STATUS_OK) ||
-        (estimator_status != FC_STATUS_OK) || !s_altitude.valid)
+    barometer_status = Drv_Bmp388_Read(&s_barometer, App_SchedulerGetTickMs());
+    if (Drv_Mmc5983ma_Read(&s_magnetometer, App_SchedulerGetTickMs()) == FC_STATUS_OK)
+    {
+        (void)Est_AttitudeSetMagnetometer(&s_magnetometer);
+    }
+    estimator_status = Est_AltitudeUpdate(&s_barometer,
+                                          &s_imu,
+                                          &s_attitude,
+                                          FC_ALTITUDE_DT_S,
+                                          &s_altitude);
+    (void)barometer_status;
+    if ((estimator_status != FC_STATUS_OK) || !s_altitude.valid)
     {
         s_altitude.valid = false;
         s_altitude_correction_us = 0.0f;
         if (s_mode == FC_MODE_ALT_HOLD)
         {
-            force_stop();
+            /* Preserve manual stabilized flight; pilot must toggle mode to retry. */
+            s_altitude_hold_fault_latched = true;
+            (void)change_mode(FC_MODE_STABILIZE);
         }
         return;
     }
 
     if ((s_mode == FC_MODE_ALT_HOLD) && (s_state == FC_STATE_RUNNING))
     {
+        float stick_delta = s_pilot.throttle - s_altitude_hold_stick_center;
+
+        if ((stick_delta > FC_ALTITUDE_STICK_DEADBAND) ||
+            (stick_delta < -FC_ALTITUDE_STICK_DEADBAND))
+        {
+            float effective_stick = stick_delta -
+                ((stick_delta > 0.0f) ? FC_ALTITUDE_STICK_DEADBAND :
+                                       -FC_ALTITUDE_STICK_DEADBAND);
+            s_altitude_target_m += effective_stick *
+                                   FC_ALTITUDE_MAX_VERTICAL_SPEED_MPS *
+                                   FC_ALTITUDE_DT_S;
+            if (s_altitude_target_m < FC_ALTITUDE_MIN_TARGET_M)
+            {
+                s_altitude_target_m = FC_ALTITUDE_MIN_TARGET_M;
+            }
+            if (s_altitude_target_m > FC_ALTITUDE_MAX_TARGET_M)
+            {
+                s_altitude_target_m = FC_ALTITUDE_MAX_TARGET_M;
+            }
+        }
         if (Ctl_AltitudeUpdate(s_altitude_target_m,
                                &s_altitude,
                                FC_ALTITUDE_DT_S,
                                &s_altitude_correction_us) != FC_STATUS_OK)
         {
             s_altitude_correction_us = 0.0f;
-            force_stop();
+            s_altitude_hold_fault_latched = true;
+            (void)change_mode(FC_MODE_STABILIZE);
         }
     }
     else
@@ -499,6 +573,9 @@ FcStatus_t App_FlightGetDebug(AppFlightDebug_t *debug)
 
     debug->imu = g_fc_flight_debug.imu;
     debug->attitude = g_fc_flight_debug.attitude;
+    debug->barometer = g_fc_flight_debug.barometer;
+    debug->magnetometer = g_fc_flight_debug.magnetometer;
+    debug->altitude = g_fc_flight_debug.altitude;
     debug->receiver = g_fc_flight_debug.receiver;
     debug->pilot = g_fc_flight_debug.pilot;
     debug->motors = g_fc_flight_debug.motors;

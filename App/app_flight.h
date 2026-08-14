@@ -20,6 +20,9 @@ typedef struct
 {
     FcImuData_t imu;
     FcAttitude_t attitude;
+    FcBarometerData_t barometer;
+    FcMagnetometerData_t magnetometer;
+    FcAltitude_t altitude;
     FcRcInput_t receiver;
     FcPilotCommand_t pilot;
     FcMotorOutput_t motors;

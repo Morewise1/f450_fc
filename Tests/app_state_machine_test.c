@@ -12,7 +12,8 @@
 #include "ctl_attitude.h"
 #include "ctl_mixer.h"
 #include "ctl_rate.h"
-#include "drv_bmp390.h"
+#include "drv_bmp388.h"
+#include "drv_mmc5983ma.h"
 #include "drv_ibus.h"
 #include "drv_bmi088.h"
 #include "est_altitude.h"
@@ -72,12 +73,20 @@ FcStatus_t BSP_BatteryAdc_Read(FcBatteryStatus_t *status, uint32_t timestamp_ms)
     return s_mock_battery.valid ? FC_STATUS_OK : FC_STATUS_NOT_READY;
 }
 
-FcStatus_t Drv_Bmp390_Read(FcBarometerData_t *data, uint32_t timestamp_ms)
+FcStatus_t Drv_Bmp388_Read(FcBarometerData_t *data, uint32_t timestamp_ms)
 {
     if (data == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
     *data = s_mock_barometer;
     data->timestamp_ms = timestamp_ms;
     return s_mock_barometer.valid ? FC_STATUS_OK : FC_STATUS_NOT_READY;
+}
+
+FcStatus_t Drv_Mmc5983ma_Read(FcMagnetometerData_t *data, uint32_t timestamp_ms)
+{
+    if (data == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    *data = (FcMagnetometerData_t){0};
+    data->timestamp_ms = timestamp_ms;
+    return FC_STATUS_NOT_READY;
 }
 
 FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu,
@@ -92,18 +101,38 @@ FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu,
     return attitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
 }
 
+FcStatus_t Est_AttitudeSetMagnetometer(const FcMagnetometerData_t *magnetometer)
+{
+    return ((magnetometer != NULL) && magnetometer->valid) ?
+           FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
 FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
-                              const FcRangeData_t *range,
+                              const FcImuData_t *imu,
+                              const FcAttitude_t *attitude,
                               float dt_s,
                               FcAltitude_t *altitude)
 {
-    (void)range;
+    (void)imu;
+    (void)attitude;
     if ((barometer == NULL) || (altitude == NULL) || !barometer->valid || (dt_s <= 0.0f))
     {
         return FC_STATUS_INVALID_ARGUMENT;
     }
     *altitude = s_mock_altitude;
     return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
+FcStatus_t Est_InertialNavUpdate(const FcImuData_t *imu,
+                                 const FcAttitude_t *attitude,
+                                 bool aircraft_stopped,
+                                 float dt_s)
+{
+    (void)imu;
+    (void)attitude;
+    (void)aircraft_stopped;
+    (void)dt_s;
+    return FC_STATUS_OK;
 }
 
 FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,

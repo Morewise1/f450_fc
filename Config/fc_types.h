@@ -80,6 +80,15 @@ typedef struct
 
 typedef struct
 {
+    int32_t raw[3];
+    FcVector3f_t magnetic_ut;
+    uint32_t timestamp_ms;
+    bool overflow;
+    bool valid;
+} FcMagnetometerData_t;
+
+typedef struct
+{
     float distance_m;
     uint32_t timestamp_ms;
     bool valid;

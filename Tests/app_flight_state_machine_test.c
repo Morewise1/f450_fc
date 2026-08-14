@@ -12,9 +12,10 @@
 #include "ctl_attitude.h"
 #include "ctl_mixer.h"
 #include "ctl_rate.h"
-#include "drv_bmp390.h"
+#include "drv_bmp388.h"
 #include "drv_ibus.h"
 #include "drv_bmi088.h"
+#include "drv_mmc5983ma.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "fc_config.h"
@@ -138,7 +139,7 @@ FcStatus_t BSP_BatteryAdc_Read(FcBatteryStatus_t *status, uint32_t timestamp_ms)
     return status->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
 }
 
-FcStatus_t Drv_Bmp390_Read(FcBarometerData_t *data, uint32_t timestamp_ms)
+FcStatus_t Drv_Bmp388_Read(FcBarometerData_t *data, uint32_t timestamp_ms)
 {
     if (data == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
     *data = (FcBarometerData_t){0};
@@ -146,6 +147,14 @@ FcStatus_t Drv_Bmp390_Read(FcBarometerData_t *data, uint32_t timestamp_ms)
     data->timestamp_ms = timestamp_ms;
     data->valid = s_altitude_status == FC_STATUS_OK;
     return s_altitude_status;
+}
+
+FcStatus_t Drv_Mmc5983ma_Read(FcMagnetometerData_t *data, uint32_t timestamp_ms)
+{
+    if (data == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    *data = (FcMagnetometerData_t){0};
+    data->timestamp_ms = timestamp_ms;
+    return FC_STATUS_NOT_READY;
 }
 
 FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *attitude)
@@ -161,12 +170,20 @@ FcStatus_t Est_AttitudeUpdate(const FcImuData_t *imu, float dt_s, FcAttitude_t *
     return attitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
 }
 
+FcStatus_t Est_AttitudeSetMagnetometer(const FcMagnetometerData_t *magnetometer)
+{
+    return ((magnetometer != NULL) && magnetometer->valid) ?
+           FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
 FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
-                              const FcRangeData_t *range,
+                              const FcImuData_t *imu,
+                              const FcAttitude_t *attitude,
                               float dt_s,
                               FcAltitude_t *altitude)
 {
-    (void)range;
+    (void)imu;
+    (void)attitude;
     (void)dt_s;
     if ((barometer == NULL) || (altitude == NULL) || !barometer->valid ||
         (s_altitude_status != FC_STATUS_OK))
@@ -177,6 +194,18 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
     *altitude = s_fake_altitude;
     altitude->timestamp_ms = s_tick_ms;
     return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
+FcStatus_t Est_InertialNavUpdate(const FcImuData_t *imu,
+                                 const FcAttitude_t *attitude,
+                                 bool aircraft_stopped,
+                                 float dt_s)
+{
+    (void)imu;
+    (void)attitude;
+    (void)aircraft_stopped;
+    (void)dt_s;
+    return FC_STATUS_OK;
 }
 
 void Ctl_RateReset(void)
@@ -356,22 +385,22 @@ int main(void)
     App_FlightTask100Hz();
     if (App_FlightGetState() != FC_STATE_RUNNING) { return 15; }
 
+    /* Re-enter ALT_HOLD only after the aircraft is running. */
+    s_tick_ms = 70U;
+    App_FlightTask100Hz();
+    if (App_FlightGetMode() != FC_MODE_ALT_HOLD) { return 25; }
+
     s_altitude_status = FC_STATUS_ERROR;
     s_tick_ms = 80U;
     App_FlightTask50Hz();
-    if ((App_FlightGetState() != FC_STATE_STOP) || s_esc_enabled ||
-        !motors_are_stopped(&s_esc_output)) { return 16; }
-    if ((s_rate_reset_count != 7U) || (s_attitude_reset_count != 7U) ||
-        (s_altitude_reset_count != 7U)) { return 17; }
+    if ((App_FlightGetState() != FC_STATE_RUNNING) ||
+        (App_FlightGetMode() != FC_MODE_STABILIZE)) { return 16; }
 
-    /* ALT_HOLD remains selected: invalid altitude must prevent re-entry to READY. */
-    s_fake_rc.throttle = 0U;
-    s_fake_rc.throttle_low = true;
+    /* Holding the switch high cannot re-enter ALT_HOLD after a sensor fault. */
     s_tick_ms = 90U;
     App_FlightTask100Hz();
-    if (App_FlightGetState() != FC_STATE_STOP) { return 18; }
-    if ((s_rate_reset_count != 7U) || (s_attitude_reset_count != 7U) ||
-        (s_altitude_reset_count != 7U)) { return 19; }
+    if ((App_FlightGetState() != FC_STATE_RUNNING) ||
+        (App_FlightGetMode() != FC_MODE_STABILIZE)) { return 18; }
 
     s_fake_battery.critical = true;
     s_fake_rc.mode_switch = false;

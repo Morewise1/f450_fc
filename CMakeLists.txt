@@ -17,10 +17,12 @@ set(FC_SOURCES
     BSP/bsp_debug_uart.c
     Drivers/Radio/drv_ibus.c
     Drivers/Sensors/drv_bmi088.c
-    Drivers/Sensors/drv_bmp390.c
+    Drivers/Sensors/drv_bmp388.c
+    Drivers/Sensors/drv_mmc5983ma.c
     Drivers/Sensors/drv_vl53l1x.c
     Estimator/est_attitude.c
     Estimator/est_altitude.c
+    Estimator/est_inertial_nav.c
     Control/ctl_pid.c
     Control/ctl_mixer.c
     Control/ctl_rate.c
@@ -104,6 +106,13 @@ add_executable(attitude_estimator_test
 )
 target_include_directories(attitude_estimator_test PRIVATE Config Control Estimator)
 
+add_executable(altitude_control_test
+    Estimator/est_altitude.c
+    Control/ctl_altitude.c
+    Tests/altitude_control_test.c
+)
+target_include_directories(altitude_control_test PRIVATE Config Control Estimator)
+
 add_executable(rc_map_test
     Control/ctl_rc_map.c
     Tests/rc_map_test.c
@@ -136,9 +145,11 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(bmi088_driver_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(esc_pwm_driver_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(attitude_estimator_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(altitude_control_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(rc_map_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_compile_options(pid_test PRIVATE -Wall -Wextra -Wpedantic -Werror)
     target_link_libraries(attitude_estimator_test PRIVATE m)
+    target_link_libraries(altitude_control_test PRIVATE m)
 endif()
 
 enable_testing()
@@ -148,5 +159,6 @@ add_test(NAME app_flight_state_machine_test COMMAND app_flight_state_machine_tes
 add_test(NAME bmi088_driver_test COMMAND bmi088_driver_test)
 add_test(NAME esc_pwm_driver_test COMMAND esc_pwm_driver_test)
 add_test(NAME attitude_estimator_test COMMAND attitude_estimator_test)
+add_test(NAME altitude_control_test COMMAND altitude_control_test)
 add_test(NAME rc_map_test COMMAND rc_map_test)
 add_test(NAME pid_test COMMAND pid_test)

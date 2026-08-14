@@ -37,6 +37,12 @@ extern I2C_HandleTypeDef hi2c2;
 #ifndef FC_BMI088_I2C_HANDLE
 #define FC_BMI088_I2C_HANDLE hi2c2
 #endif
+#ifndef FC_BMP388_I2C_HANDLE
+#define FC_BMP388_I2C_HANDLE hi2c2
+#endif
+#ifndef FC_MMC5983MA_I2C_HANDLE
+#define FC_MMC5983MA_I2C_HANDLE hi2c2
+#endif
 
 /* ESC mapping: TIM3 CH1-CH4 on PA6, PA7, PB0, and PB1. */
 #ifndef FC_ESC_M1_TIM_HANDLE

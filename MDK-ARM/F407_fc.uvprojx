@@ -858,6 +858,11 @@
               <FileType>1</FileType>
               <FilePath>..\Estimator\est_attitude.c</FilePath>
             </File>
+            <File>
+              <FileName>est_inertial_nav.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Estimator\est_inertial_nav.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -879,9 +884,14 @@
               <FilePath>..\Drivers\Sensors\drv_bmi088.c</FilePath>
             </File>
             <File>
-              <FileName>drv_bmp390.c</FileName>
+              <FileName>drv_bmp388.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Drivers\Sensors\drv_bmp390.c</FilePath>
+              <FilePath>..\Drivers\Sensors\drv_bmp388.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_mmc5983ma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\Sensors\drv_mmc5983ma.c</FilePath>
             </File>
             <File>
               <FileName>drv_vl53l1x.c</FileName>
