@@ -15,6 +15,7 @@ set(FC_SOURCES
     BSP/bsp_esc_pwm.c
     BSP/bsp_battery_adc.c
     BSP/bsp_debug_uart.c
+    BSP/bsp_soft_i2c.c
     Drivers/Radio/drv_ibus.c
     Drivers/Sensors/drv_bmi088.c
     Drivers/Sensors/drv_bmp388.c

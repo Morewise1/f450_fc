@@ -109,6 +109,15 @@
 #define FC_BMI088_EXPECTED_GYRO_CHIP_ID      0x0FU
 
 #define FC_SENSOR_I2C_TIMEOUT_MS                2U
+
+/*
+ * Independent GPIO bit-banged buses for BMP388 and MMC5983MA.  A 5 us
+ * half-period targets 100 kHz and leaves timing margin for HAL GPIO calls.
+ * Clock stretching or a stuck SCL line is abandoned after 100 us so a bad
+ * sensor cannot stall the flight loop indefinitely.
+ */
+#define FC_SOFT_I2C_HALF_PERIOD_US              5U
+#define FC_SOFT_I2C_STRETCH_TIMEOUT_US        100U
 #define FC_BMP388_I2C_ADDRESS_LOW             0x76U
 #define FC_BMP388_I2C_ADDRESS_HIGH            0x77U
 #define FC_BMP388_EXPECTED_CHIP_ID             0x50U

@@ -1,6 +1,7 @@
 /* BMP388 I2C driver using Bosch NVM compensation coefficients. */
 
 #include <stddef.h>
+#include "bsp_soft_i2c.h"
 #include "drv_bmp388.h"
 #include "fc_board.h"
 #include "fc_config.h"
@@ -98,43 +99,25 @@ static void invalidate_output(FcBarometerData_t *data, uint32_t timestamp_ms)
 }
 
 #if FC_USE_STM32_HAL
-static FcStatus_t hal_status_to_fc(HAL_StatusTypeDef status)
-{
-    if (status == HAL_OK) { return FC_STATUS_OK; }
-    if (status == HAL_BUSY) { return FC_STATUS_BUSY; }
-    if (status == HAL_TIMEOUT) { return FC_STATUS_TIMEOUT; }
-    return FC_STATUS_ERROR;
-}
-
 static FcStatus_t read_registers(uint8_t reg, uint8_t *data, uint16_t length)
 {
-    HAL_StatusTypeDef status;
-
     if ((data == NULL) || (length == 0U)) { return FC_STATUS_INVALID_ARGUMENT; }
     if (s_state.address_7bit == 0U) { return FC_STATUS_NOT_READY; }
-    status = HAL_I2C_Mem_Read(&FC_BMP388_I2C_HANDLE,
-                              (uint16_t)s_state.address_7bit << 1U,
-                              reg,
-                              I2C_MEMADD_SIZE_8BIT,
-                              data,
-                              length,
-                              FC_SENSOR_I2C_TIMEOUT_MS);
-    return hal_status_to_fc(status);
+    return BSP_SoftI2c_MemRead(BSP_SOFT_I2C_BUS_BMP388,
+                               s_state.address_7bit,
+                               reg,
+                               data,
+                               length);
 }
 
 static FcStatus_t write_register(uint8_t reg, uint8_t value)
 {
-    HAL_StatusTypeDef status;
-
     if (s_state.address_7bit == 0U) { return FC_STATUS_NOT_READY; }
-    status = HAL_I2C_Mem_Write(&FC_BMP388_I2C_HANDLE,
-                               (uint16_t)s_state.address_7bit << 1U,
-                               reg,
-                               I2C_MEMADD_SIZE_8BIT,
-                               &value,
-                               1U,
-                               FC_SENSOR_I2C_TIMEOUT_MS);
-    return hal_status_to_fc(status);
+    return BSP_SoftI2c_MemWrite(BSP_SOFT_I2C_BUS_BMP388,
+                                s_state.address_7bit,
+                                reg,
+                                &value,
+                                1U);
 }
 
 static FcStatus_t probe_address(void)
@@ -148,14 +131,13 @@ static FcStatus_t probe_address(void)
     for (index = 0U; index < 2U; ++index)
     {
         uint8_t chip_id = 0U;
-        HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&FC_BMP388_I2C_HANDLE,
-                                                    (uint16_t)addresses[index] << 1U,
-                                                    BMP388_REG_CHIP_ID,
-                                                    I2C_MEMADD_SIZE_8BIT,
-                                                    &chip_id,
-                                                    1U,
-                                                    FC_SENSOR_I2C_TIMEOUT_MS);
-        if ((status == HAL_OK) && (chip_id == FC_BMP388_EXPECTED_CHIP_ID))
+        FcStatus_t status = BSP_SoftI2c_MemRead(BSP_SOFT_I2C_BUS_BMP388,
+                                                addresses[index],
+                                                BMP388_REG_CHIP_ID,
+                                                &chip_id,
+                                                1U);
+        if ((status == FC_STATUS_OK) &&
+            (chip_id == FC_BMP388_EXPECTED_CHIP_ID))
         {
             s_state.address_7bit = addresses[index];
             s_state.chip_id = chip_id;
@@ -241,8 +223,12 @@ FcStatus_t Drv_Bmp388_Init(void)
     uint8_t error_register = 0U;
     FcStatus_t status;
 
-    HAL_Delay(FC_BMP388_STARTUP_DELAY_MS);
-    status = probe_address();
+    status = BSP_SoftI2c_Init(BSP_SOFT_I2C_BUS_BMP388);
+    if (status == FC_STATUS_OK)
+    {
+        HAL_Delay(FC_BMP388_STARTUP_DELAY_MS);
+        status = probe_address();
+    }
     if (status == FC_STATUS_OK)
     {
         status = read_registers(BMP388_REG_STATUS, &status_register, 1U);

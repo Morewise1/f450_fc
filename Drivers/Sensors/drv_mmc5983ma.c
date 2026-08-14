@@ -1,6 +1,7 @@
 /* MMC5983MA I2C driver with 18-bit conversion and periodic automatic SET. */
 
 #include <stddef.h>
+#include "bsp_soft_i2c.h"
 #include "drv_mmc5983ma.h"
 #include "fc_board.h"
 #include "fc_config.h"
@@ -127,39 +128,23 @@ static void invalidate_output(FcMagnetometerData_t *data, uint32_t timestamp_ms)
 }
 
 #if FC_USE_STM32_HAL
-static FcStatus_t hal_status_to_fc(HAL_StatusTypeDef status)
-{
-    if (status == HAL_OK) { return FC_STATUS_OK; }
-    if (status == HAL_BUSY) { return FC_STATUS_BUSY; }
-    if (status == HAL_TIMEOUT) { return FC_STATUS_TIMEOUT; }
-    return FC_STATUS_ERROR;
-}
-
 static FcStatus_t read_registers(uint8_t reg, uint8_t *data, uint16_t length)
 {
-    HAL_StatusTypeDef status;
-
     if ((data == NULL) || (length == 0U)) { return FC_STATUS_INVALID_ARGUMENT; }
-    status = HAL_I2C_Mem_Read(&FC_MMC5983MA_I2C_HANDLE,
-                              (uint16_t)FC_MMC5983MA_I2C_ADDRESS << 1U,
-                              reg,
-                              I2C_MEMADD_SIZE_8BIT,
-                              data,
-                              length,
-                              FC_SENSOR_I2C_TIMEOUT_MS);
-    return hal_status_to_fc(status);
+    return BSP_SoftI2c_MemRead(BSP_SOFT_I2C_BUS_MMC5983MA,
+                               FC_MMC5983MA_I2C_ADDRESS,
+                               reg,
+                               data,
+                               length);
 }
 
 static FcStatus_t write_register(uint8_t reg, uint8_t value)
 {
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&FC_MMC5983MA_I2C_HANDLE,
-                                                 (uint16_t)FC_MMC5983MA_I2C_ADDRESS << 1U,
-                                                 reg,
-                                                 I2C_MEMADD_SIZE_8BIT,
-                                                 &value,
-                                                 1U,
-                                                 FC_SENSOR_I2C_TIMEOUT_MS);
-    return hal_status_to_fc(status);
+    return BSP_SoftI2c_MemWrite(BSP_SOFT_I2C_BUS_MMC5983MA,
+                                FC_MMC5983MA_I2C_ADDRESS,
+                                reg,
+                                &value,
+                                1U);
 }
 
 static uint32_t unpack_axis(uint8_t msb,
@@ -194,8 +179,14 @@ FcStatus_t Drv_Mmc5983ma_Init(void)
     uint8_t status_register = 0U;
     FcStatus_t status;
 
-    HAL_Delay(FC_MMC5983MA_STARTUP_DELAY_MS);
-    status = read_registers(MMC5983MA_REG_PRODUCT_ID, &s_state.product_id, 1U);
+    status = BSP_SoftI2c_Init(BSP_SOFT_I2C_BUS_MMC5983MA);
+    if (status == FC_STATUS_OK)
+    {
+        HAL_Delay(FC_MMC5983MA_STARTUP_DELAY_MS);
+        status = read_registers(MMC5983MA_REG_PRODUCT_ID,
+                                &s_state.product_id,
+                                1U);
+    }
     if ((status == FC_STATUS_OK) &&
         (s_state.product_id != FC_MMC5983MA_EXPECTED_PRODUCT_ID))
     {
