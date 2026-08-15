@@ -40,7 +40,8 @@ extern I2C_HandleTypeDef hi2c2;
 
 /*
  * BMP388 and MMC5983MA use two independent software-I2C buses.  These pins
- * are initialized by BSP_SoftI2c_Init(), so CubeMX must leave PB6-PB9 free.
+ * are initialized by BSP_SoftI2c_Init(), so CubeMX must leave PB6/PB7 and
+ * PC0/PC1 free.
  */
 #ifndef FC_BMP388_SOFT_I2C_SCL_GPIO_PORT
 #define FC_BMP388_SOFT_I2C_SCL_GPIO_PORT GPIOB
@@ -59,19 +60,19 @@ extern I2C_HandleTypeDef hi2c2;
 #endif
 
 #ifndef FC_MMC5983MA_SOFT_I2C_SCL_GPIO_PORT
-#define FC_MMC5983MA_SOFT_I2C_SCL_GPIO_PORT GPIOB
+#define FC_MMC5983MA_SOFT_I2C_SCL_GPIO_PORT GPIOC
 #endif
 #ifndef FC_MMC5983MA_SOFT_I2C_SCL_PIN
-#define FC_MMC5983MA_SOFT_I2C_SCL_PIN       GPIO_PIN_8
+#define FC_MMC5983MA_SOFT_I2C_SCL_PIN       GPIO_PIN_0
 #endif
 #ifndef FC_MMC5983MA_SOFT_I2C_SDA_GPIO_PORT
-#define FC_MMC5983MA_SOFT_I2C_SDA_GPIO_PORT GPIOB
+#define FC_MMC5983MA_SOFT_I2C_SDA_GPIO_PORT GPIOC
 #endif
 #ifndef FC_MMC5983MA_SOFT_I2C_SDA_PIN
-#define FC_MMC5983MA_SOFT_I2C_SDA_PIN       GPIO_PIN_9
+#define FC_MMC5983MA_SOFT_I2C_SDA_PIN       GPIO_PIN_1
 #endif
 #ifndef FC_MMC5983MA_SOFT_I2C_GPIO_CLOCK_ENABLE
-#define FC_MMC5983MA_SOFT_I2C_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define FC_MMC5983MA_SOFT_I2C_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
 #endif
 
 /* ESC mapping: TIM3 CH1-CH4 on PA6, PA7, PB0, and PB1. */

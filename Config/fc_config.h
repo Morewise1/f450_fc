@@ -168,14 +168,15 @@
  * BMI088 and MMC5983MA filtering remain untouched.
  *
  * FAST:
- *   BMP388 IIR coefficient 1, 8 Hz software pressure LPF, 5 Hz velocity LPF.
- *   Lowest delay; use for bench response checks or a well-shielded barometer.
+ *   BMP388 IIR coefficient 1, 5 Hz software pressure LPF, 3 Hz velocity LPF.
+ *   Lowest delay; use for response checks or a well-shielded barometer.
  * BALANCED (recommended default):
- *   BMP388 IIR coefficient 3, 5 Hz pressure LPF, 3 Hz velocity LPF.
- *   Best starting compromise for a small F450 with moderate propeller wash.
+ *   BMP388 IIR coefficient 3, 2 Hz pressure LPF, 1 Hz velocity LPF.
+ *   Smoother default for indoor tests and a small F450.
  * STRONG:
- *   BMP388 IIR coefficient 7, 3 Hz pressure LPF, 2 Hz velocity LPF.
- *   Use when altitude visibly jitters; it is smoother but reacts later.
+ *   BMP388 IIR coefficient 7, 0.8 Hz pressure LPF, 0.4 Hz velocity LPF.
+ *   Bench-diagnosis/very noisy-air mode.  Its delay can require altitude-loop
+ *   retuning, so do not select it for a first flight.
  *
  * Change FC_BARO_FILTER_MODE, rebuild the whole Keil project, and re-flash.
  */
@@ -188,26 +189,27 @@
 
 #if FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_FAST
 #define FC_BMP388_IIR_REGISTER_VALUE             0x02U
-#define FC_BARO_PRESSURE_LPF_HZ                    8.0f
-#define FC_BARO_VELOCITY_LPF_HZ                    5.0f
-#elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_BALANCED
-#define FC_BMP388_IIR_REGISTER_VALUE             0x04U
 #define FC_BARO_PRESSURE_LPF_HZ                    5.0f
 #define FC_BARO_VELOCITY_LPF_HZ                    3.0f
+#elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_BALANCED
+#define FC_BMP388_IIR_REGISTER_VALUE             0x04U
+#define FC_BARO_PRESSURE_LPF_HZ                    2.0f
+#define FC_BARO_VELOCITY_LPF_HZ                    1.0f
 #elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_STRONG
 #define FC_BMP388_IIR_REGISTER_VALUE             0x06U
-#define FC_BARO_PRESSURE_LPF_HZ                    3.0f
-#define FC_BARO_VELOCITY_LPF_HZ                    2.0f
+#define FC_BARO_PRESSURE_LPF_HZ                    0.8f
+#define FC_BARO_VELOCITY_LPF_HZ                    0.4f
 #else
 #error "FC_BARO_FILTER_MODE must be FAST, BALANCED, or STRONG"
 #endif
 
 /* BMP388 + BMI088 relative-altitude estimator and conservative controller. */
-#define FC_BARO_REFERENCE_SAMPLE_COUNT             100U
+/* Ten seconds at 50 Hz lets the powered sensor and its local air settle. */
+#define FC_BARO_REFERENCE_SAMPLE_COUNT             500U
 #define FC_BARO_MAX_SAMPLE_STEP_M                    1.5f
 #define FC_BARO_INNOVATION_LIMIT_M                   2.0f
-#define FC_VERTICAL_BARO_POSITION_BLEND              0.10f
-#define FC_VERTICAL_BARO_VELOCITY_BLEND              0.08f
+#define FC_VERTICAL_BARO_POSITION_BLEND              0.5f
+#define FC_VERTICAL_BARO_VELOCITY_BLEND              0.48f
 #define FC_VERTICAL_ACCEL_MIN_NORM_SQ                 0.36f
 #define FC_VERTICAL_ACCEL_MAX_NORM_SQ                 2.89f
 #define FC_VERTICAL_ACCEL_LIMIT_MPS2                 12.0f

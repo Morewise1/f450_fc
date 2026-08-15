@@ -371,6 +371,14 @@ void App_FlightTask100Hz(void)
     ++s_task_stats.task_100hz_count;
 
     now_ms = App_SchedulerGetTickMs();
+    /* MMC5983MA continuous conversion is configured for 100 Hz.  Read it in
+     * the matching task so the attitude estimator receives each fresh sample
+     * once; the BMP388 and altitude loop remain at their noise-friendly 50 Hz.
+     */
+    if (Drv_Mmc5983ma_Read(&s_magnetometer, now_ms) == FC_STATUS_OK)
+    {
+        (void)Est_AttitudeSetMagnetometer(&s_magnetometer);
+    }
     Drv_Ibus_UpdateTimeout(now_ms);
     if (Drv_Ibus_GetInput(&s_rc) != FC_STATUS_OK)
     {
@@ -460,10 +468,6 @@ void App_FlightTask50Hz(void)
     ++s_task_stats.task_50hz_count;
 
     barometer_status = Drv_Bmp388_Read(&s_barometer, App_SchedulerGetTickMs());
-    if (Drv_Mmc5983ma_Read(&s_magnetometer, App_SchedulerGetTickMs()) == FC_STATUS_OK)
-    {
-        (void)Est_AttitudeSetMagnetometer(&s_magnetometer);
-    }
     estimator_status = Est_AltitudeUpdate(&s_barometer,
                                           &s_imu,
                                           &s_attitude,

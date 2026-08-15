@@ -24,8 +24,12 @@
 #define BMP388_CALIB_DATA_LENGTH         21U
 #define BMP388_SAMPLE_DATA_LENGTH          6U
 
-/* Pressure x8, temperature x2, 50 Hz, selectable IIR, normal mode. */
-#define BMP388_OSR_VALUE               0x0BU
+/*
+ * Pressure x8, temperature x1, 50 Hz, selectable IIR, normal mode.
+ * x8/x2 needs about 20.939 ms and violates the 20 ms period at 50 Hz;
+ * x8/x1 needs about 18.939 ms and is a valid Bosch drone configuration.
+ */
+#define BMP388_OSR_VALUE               0x03U
 #define BMP388_ODR_VALUE               0x02U
 #define BMP388_CONFIG_VALUE            FC_BMP388_IIR_REGISTER_VALUE
 #define BMP388_PWR_CTRL_VALUE          0x33U
@@ -232,6 +236,7 @@ FcStatus_t Drv_Bmp388_Init(void)
     if (status == FC_STATUS_OK)
     {
         status = read_registers(BMP388_REG_STATUS, &status_register, 1U);
+        g_bmp388_debug.status_register = status_register;
     }
     if ((status == FC_STATUS_OK) &&
         ((status_register & BMP388_STATUS_COMMAND_READY) == 0U))
@@ -256,6 +261,7 @@ FcStatus_t Drv_Bmp388_Init(void)
     {
         HAL_Delay(FC_BMP388_RESET_DELAY_MS);
         status = read_registers(BMP388_REG_ERROR, &error_register, 1U);
+        g_bmp388_debug.error_register = error_register;
     }
     if ((status == FC_STATUS_OK) && ((error_register & BMP388_ERROR_MASK) != 0U))
     {
@@ -328,6 +334,8 @@ FcStatus_t Drv_Bmp388_GetDebug(DrvBmp388Debug_t *debug)
     if (debug == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
     debug->address_7bit = g_bmp388_debug.address_7bit;
     debug->chip_id = g_bmp388_debug.chip_id;
+    debug->status_register = g_bmp388_debug.status_register;
+    debug->error_register = g_bmp388_debug.error_register;
     debug->init_status = g_bmp388_debug.init_status;
     debug->last_read_status = g_bmp388_debug.last_read_status;
     debug->valid_read_count = g_bmp388_debug.valid_read_count;

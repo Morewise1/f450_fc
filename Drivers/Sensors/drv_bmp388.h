@@ -11,6 +11,8 @@ typedef struct
 {
     uint8_t address_7bit;
     uint8_t chip_id;
+    uint8_t status_register;
+    uint8_t error_register;
     FcStatus_t init_status;
     FcStatus_t last_read_status;
     uint32_t valid_read_count;
