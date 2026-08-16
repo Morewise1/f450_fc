@@ -1,6 +1,7 @@
 /* Initializes all layers and dispatches task flags from the main loop. */
 
 #include "app_main.h"
+#include "app_command_mux.h"
 #include "app_flight.h"
 #include "app_safety.h"
 #include "app_scheduler.h"
@@ -20,6 +21,7 @@
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "est_inertial_nav.h"
+#include "fc_link_service.h"
 
 static FcStatus_t s_status = FC_STATUS_NOT_INITIALIZED;
 static bool s_loop_enabled;
@@ -41,6 +43,7 @@ FcStatus_t App_MainInit(void)
 
     record_failure(App_SchedulerInit());
     record_failure(App_SafetyInit());
+    record_failure(App_CommandMuxInit());
     record_failure(App_FlightInit());
 
     record_failure(BSP_EscPwm_Init());
@@ -95,6 +98,9 @@ void App_MainLoop(void)
     if ((tasks & APP_SCHEDULER_TASK_250HZ) != 0U) { App_FlightTask250Hz(); }
     if ((tasks & APP_SCHEDULER_TASK_500HZ) != 0U) { App_FlightTask500Hz(); }
     if ((tasks & APP_SCHEDULER_TASK_10HZ) != 0U) { App_FlightTask10Hz(); }
+
+    /* Bounded asynchronous ESP link work; never run UART polling in an ISR. */
+    FcLink_Service();
 }
 
 FcStatus_t App_MainGetStatus(void)

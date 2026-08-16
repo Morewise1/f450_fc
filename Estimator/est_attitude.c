@@ -162,6 +162,8 @@ static bool apply_magnetic_yaw_feedback(uint32_t timestamp_ms,
     float pitch_rad;
     float horizontal_x;
     float horizontal_y;
+    float horizontal_sq;
+    float total_field_sq;
     float magnetic_heading_deg;
     float desired_yaw_deg;
     float yaw_error_deg;
@@ -170,6 +172,7 @@ static bool apply_magnetic_yaw_feedback(uint32_t timestamp_ms,
     if (!s_state.level_calibrated || !s_state.magnetometer.valid ||
         ((timestamp_ms - s_state.magnetometer.timestamp_ms) > FC_MAG_DATA_TIMEOUT_MS))
     {
+        g_est_attitude_debug.magnetic_correction_dps = 0.0f;
         g_est_attitude_debug.magnetic_aiding_active = false;
         return false;
     }
@@ -182,9 +185,29 @@ static bool apply_magnetic_yaw_feedback(uint32_t timestamp_ms,
                    (s_state.magnetometer.magnetic_ut.z * cosf(roll_rad) * sinf(pitch_rad));
     horizontal_y = (s_state.magnetometer.magnetic_ut.y * cosf(roll_rad)) -
                    (s_state.magnetometer.magnetic_ut.z * sinf(roll_rad));
-    if (((horizontal_x * horizontal_x) + (horizontal_y * horizontal_y)) < 1.0f)
+    horizontal_sq = (horizontal_x * horizontal_x) + (horizontal_y * horizontal_y);
+    total_field_sq =
+        (s_state.magnetometer.magnetic_ut.x * s_state.magnetometer.magnetic_ut.x) +
+        (s_state.magnetometer.magnetic_ut.y * s_state.magnetometer.magnetic_ut.y) +
+        (s_state.magnetometer.magnetic_ut.z * s_state.magnetometer.magnetic_ut.z);
+    g_est_attitude_debug.magnetic_horizontal_ut =
+        (horizontal_sq >= 0.0f) ? sqrtf(horizontal_sq) : 0.0f;
+
+    /* Never evaluate atan2(0, 0), NaN/Inf inputs, an almost vertical field,
+     * or tilt outside the useful envelope of this F450.  Failure here removes
+     * only magnetic correction; gyro yaw integration continues unchanged.
+     */
+    if (!((total_field_sq >= (FC_MAG_VALID_MIN_FIELD_UT * FC_MAG_VALID_MIN_FIELD_UT)) &&
+          (total_field_sq <= (FC_MAG_VALID_MAX_FIELD_UT * FC_MAG_VALID_MAX_FIELD_UT)) &&
+          (horizontal_sq >= (FC_MAG_MIN_HORIZONTAL_FIELD_UT *
+                             FC_MAG_MIN_HORIZONTAL_FIELD_UT)) &&
+          (horizontal_sq >= (total_field_sq * FC_MAG_MIN_HORIZONTAL_RATIO *
+                             FC_MAG_MIN_HORIZONTAL_RATIO)) &&
+          (fabsf(raw_attitude.roll_deg) <= FC_MAG_YAW_MAX_TILT_DEG) &&
+          (fabsf(raw_attitude.pitch_deg) <= FC_MAG_YAW_MAX_TILT_DEG)))
     {
         ++g_est_attitude_debug.magnetic_reject_count;
+        g_est_attitude_debug.magnetic_correction_dps = 0.0f;
         g_est_attitude_debug.magnetic_aiding_active = false;
         return false;
     }
@@ -198,12 +221,21 @@ static bool apply_magnetic_yaw_feedback(uint32_t timestamp_ms,
     }
     desired_yaw_deg = wrap_degrees(magnetic_heading_deg - s_state.magnetic_yaw_offset_deg);
     yaw_error_deg = wrap_degrees(desired_yaw_deg - raw_attitude.yaw_deg);
+    if (fabsf(yaw_error_deg) > FC_MAG_YAW_ERROR_REJECT_DEG)
+    {
+        ++g_est_attitude_debug.magnetic_reject_count;
+        g_est_attitude_debug.magnetic_yaw_error_deg = yaw_error_deg;
+        g_est_attitude_debug.magnetic_correction_dps = 0.0f;
+        g_est_attitude_debug.magnetic_aiding_active = false;
+        return false;
+    }
     correction_dps = clamp_float(yaw_error_deg * FC_MAG_YAW_KP,
                                  -FC_MAG_YAW_MAX_CORRECTION_DPS,
                                  FC_MAG_YAW_MAX_CORRECTION_DPS);
     gyro_rad_s->z += correction_dps * DEG_TO_RAD;
     g_est_attitude_debug.magnetic_heading_deg = magnetic_heading_deg;
     g_est_attitude_debug.magnetic_yaw_error_deg = yaw_error_deg;
+    g_est_attitude_debug.magnetic_correction_dps = correction_dps;
     g_est_attitude_debug.magnetic_heading_initialized = true;
     g_est_attitude_debug.magnetic_aiding_active = true;
     return true;

@@ -1,6 +1,7 @@
 /* Cooperative flight tasks and explicit fail-closed state transitions. */
 
 #include "app_flight.h"
+#include "app_command_mux.h"
 #include "app_safety.h"
 #include "app_scheduler.h"
 #include "bsp_battery_adc.h"
@@ -319,6 +320,7 @@ void App_FlightTask500Hz(void)
 void App_FlightTask250Hz(void)
 {
     FcControlTarget_t target = {0};
+    uint32_t now_ms;
 
     if (!s_initialized)
     {
@@ -333,6 +335,18 @@ void App_FlightTask250Hz(void)
         force_stop();
         return;
     }
+
+    /*
+     * In Kalman mode this is the high-rate inertial prediction.  In the
+     * complementary fallback mode the call only republishes the latest 50 Hz
+     * state, so one application task layout safely supports both estimators.
+     */
+    now_ms = App_SchedulerGetTickMs();
+    (void)Est_AltitudePredict(&s_imu,
+                              &s_attitude,
+                              FC_ATTITUDE_DT_S,
+                              now_ms,
+                              &s_altitude);
 
     if (s_state != FC_STATE_RUNNING)
     {
@@ -360,6 +374,7 @@ void App_FlightTask250Hz(void)
 void App_FlightTask100Hz(void)
 {
     AppSchedulerStats_t scheduler_stats = {0};
+    FcRcInput_t ibus_input = {0};
     FcFlightMode_t requested_mode;
     uint32_t now_ms;
     bool scheduler_ok;
@@ -380,9 +395,15 @@ void App_FlightTask100Hz(void)
         (void)Est_AttitudeSetMagnetometer(&s_magnetometer);
     }
     Drv_Ibus_UpdateTimeout(now_ms);
-    if (Drv_Ibus_GetInput(&s_rc) != FC_STATUS_OK)
+    if (Drv_Ibus_GetInput(&ibus_input) != FC_STATUS_OK)
     {
-        s_rc = (FcRcInput_t){0};
+        ibus_input = (FcRcInput_t){0};
+        ibus_input.failsafe = true;
+    }
+    App_CommandMuxUpdateIbus(&ibus_input);
+    if (App_CommandMuxGetInput(now_ms, &s_rc) != FC_STATUS_OK)
+    {
+        s_rc.link_valid = false;
         s_rc.failsafe = true;
     }
     if (Ctl_RcMapUpdate(&s_rc, &s_pilot) != FC_STATUS_OK)

@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx,FC_USE_STM32_HAL=1,FC_BOARD_HAL_BINDINGS_COMPLETE=1</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../App;../BSP;../Config;../Control;../Drivers/Radio;../Drivers/Sensors;../Estimator</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../App;../BSP;../Communication;../Config;../Control;../Drivers/Radio;../Drivers/Sensors;../Estimator</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -759,6 +759,11 @@
           <GroupName>FC/App</GroupName>
           <Files>
             <File>
+              <FileName>app_command_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\App\app_command_mux.c</FilePath>
+            </File>
+            <File>
               <FileName>app_flight.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\App\app_flight.c</FilePath>
@@ -804,6 +809,11 @@
               <FilePath>..\BSP\bsp_esc_pwm.c</FilePath>
             </File>
             <File>
+              <FileName>bsp_esp_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\bsp_esp_uart.c</FilePath>
+            </File>
+            <File>
               <FileName>bsp_led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\bsp_led.c</FilePath>
@@ -812,6 +822,21 @@
               <FileName>bsp_soft_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\bsp_soft_i2c.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FC/Communication</GroupName>
+          <Files>
+            <File>
+              <FileName>fc_link_protocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Communication\fc_link_protocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>fc_link_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Communication\fc_link_service.c</FilePath>
             </File>
           </Files>
         </Group>

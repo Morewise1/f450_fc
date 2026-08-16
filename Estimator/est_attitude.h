@@ -12,6 +12,8 @@ typedef struct
     uint32_t level_sample_count;
     float magnetic_heading_deg;
     float magnetic_yaw_error_deg;
+    float magnetic_horizontal_ut;
+    float magnetic_correction_dps;
     uint32_t magnetic_reject_count;
     bool aligned;
     bool level_calibrated;

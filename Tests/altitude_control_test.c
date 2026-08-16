@@ -10,6 +10,25 @@ static int nearly_equal(float actual, float expected, float tolerance)
     return fabsf(actual - expected) <= tolerance;
 }
 
+static void predict_one_barometer_period(const FcImuData_t *imu,
+                                         const FcAttitude_t *attitude,
+                                         uint32_t timestamp_ms,
+                                         FcAltitude_t *altitude)
+{
+    uint32_t prediction;
+
+    for (prediction = 0U;
+         prediction < (FC_ATTITUDE_RATE_HZ / FC_ALTITUDE_RATE_HZ);
+         ++prediction)
+    {
+        (void)Est_AltitudePredict(imu,
+                                  attitude,
+                                  FC_ATTITUDE_DT_S,
+                                  timestamp_ms,
+                                  altitude);
+    }
+}
+
 int main(void)
 {
     FcBarometerData_t barometer = {0};
@@ -44,6 +63,8 @@ int main(void)
     for (sample = 0U; sample < 100U; ++sample)
     {
         barometer.timestamp_ms += 20U;
+        predict_one_barometer_period(&imu, &attitude,
+                                     barometer.timestamp_ms, &altitude);
         if (Est_AltitudeUpdate(&barometer, &imu, &attitude, 0.02f, &altitude) != FC_STATUS_OK)
         {
             return 5;
@@ -56,14 +77,20 @@ int main(void)
     for (sample = 0U; sample < (FC_BARO_INERTIAL_HOLD_TIMEOUT_MS / 20U); ++sample)
     {
         barometer.timestamp_ms += 20U;
+        predict_one_barometer_period(&imu, &attitude,
+                                     barometer.timestamp_ms, &altitude);
         if (Est_AltitudeUpdate(&barometer, &imu, &attitude, 0.02f, &altitude) !=
             FC_STATUS_OK) { return 11; }
     }
     barometer.timestamp_ms += 20U;
+    predict_one_barometer_period(&imu, &attitude,
+                                 barometer.timestamp_ms, &altitude);
     if ((Est_AltitudeUpdate(&barometer, &imu, &attitude, 0.02f, &altitude) !=
          FC_STATUS_TIMEOUT) || altitude.valid) { return 12; }
     barometer.valid = true;
     barometer.timestamp_ms += 20U;
+    predict_one_barometer_period(&imu, &attitude,
+                                 barometer.timestamp_ms, &altitude);
     if (Est_AltitudeUpdate(&barometer, &imu, &attitude, 0.02f, &altitude) !=
         FC_STATUS_OK) { return 13; }
 

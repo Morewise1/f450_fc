@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "app_command_mux.h"
 #include "app_flight.h"
 #include "app_safety.h"
 #include "app_scheduler.h"
@@ -196,6 +197,21 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
     return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
 }
 
+FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
+                               const FcAttitude_t *attitude,
+                               float dt_s,
+                               uint32_t timestamp_ms,
+                               FcAltitude_t *altitude)
+{
+    (void)imu;
+    (void)attitude;
+    (void)dt_s;
+    if (altitude == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    *altitude = s_fake_altitude;
+    altitude->timestamp_ms = timestamp_ms;
+    return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
 FcStatus_t Est_InertialNavUpdate(const FcImuData_t *imu,
                                  const FcAttitude_t *attitude,
                                  bool aircraft_stopped,
@@ -320,6 +336,7 @@ int main(void)
     prepare_safe_inputs();
     if (App_SafetyInit() != FC_STATUS_OK) { return 1; }
     App_SafetySetInitializationResult(true);
+    if (App_CommandMuxInit() != FC_STATUS_OK) { return 26; }
     if (App_FlightInit() != FC_STATUS_OK) { return 2; }
     if ((App_FlightGetState() != FC_STATE_STOP) ||
         (App_FlightGetMode() != FC_MODE_STABILIZE) || !motors_are_stopped(&s_esc_output)) { return 3; }

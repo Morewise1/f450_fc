@@ -13,18 +13,30 @@ typedef struct
     float filtered_altitude_m;
     float vertical_velocity_mps;
     float vertical_acceleration_mps2;
+    float acceleration_bias_mps2;
     float barometer_innovation_m;
+    float kalman_position_variance;
+    float kalman_velocity_variance;
+    float kalman_bias_variance;
     uint32_t last_valid_barometer_ms;
     uint32_t reference_sample_count;
     uint32_t rejected_sample_count;
+    uint32_t prediction_count;
+    uint32_t correction_count;
     bool reference_ready;
     bool inertial_aiding_active;
     bool barometer_recent;
+    bool kalman_enabled;
 } EstAltitudeDebug_t;
 
 extern volatile EstAltitudeDebug_t g_est_altitude_debug;
 
 FcStatus_t Est_AltitudeInit(void);
+FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
+                               const FcAttitude_t *attitude,
+                               float dt_s,
+                               uint32_t timestamp_ms,
+                               FcAltitude_t *altitude);
 FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
                               const FcImuData_t *imu,
                               const FcAttitude_t *attitude,

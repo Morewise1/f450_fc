@@ -7,6 +7,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 set(FC_SOURCES
     App/app_main.c
+    App/app_command_mux.c
     App/app_scheduler.c
     App/app_flight.c
     App/app_safety.c
@@ -15,6 +16,7 @@ set(FC_SOURCES
     BSP/bsp_esc_pwm.c
     BSP/bsp_battery_adc.c
     BSP/bsp_debug_uart.c
+    BSP/bsp_esp_uart.c
     BSP/bsp_soft_i2c.c
     Drivers/Radio/drv_ibus.c
     Drivers/Sensors/drv_bmi088.c
@@ -30,12 +32,15 @@ set(FC_SOURCES
     Control/ctl_attitude.c
     Control/ctl_altitude.c
     Control/ctl_rc_map.c
+    Communication/fc_link_protocol.c
+    Communication/fc_link_service.c
 )
 
 add_library(f407_fc_core STATIC ${FC_SOURCES})
 target_include_directories(f407_fc_core PUBLIC
     App
     BSP
+    Communication
     Config
     Control
     Drivers/Radio
@@ -58,6 +63,7 @@ add_executable(app_scheduler_test
 target_include_directories(app_scheduler_test PRIVATE App Config)
 
 add_executable(app_flight_state_machine_test
+    App/app_command_mux.c
     App/app_flight.c
     App/app_safety.c
     Control/ctl_rc_map.c

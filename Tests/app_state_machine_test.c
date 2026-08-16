@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "app_command_mux.h"
 #include "app_flight.h"
 #include "app_safety.h"
 #include "app_scheduler.h"
@@ -120,6 +121,21 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
         return FC_STATUS_INVALID_ARGUMENT;
     }
     *altitude = s_mock_altitude;
+    return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
+}
+
+FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
+                               const FcAttitude_t *attitude,
+                               float dt_s,
+                               uint32_t timestamp_ms,
+                               FcAltitude_t *altitude)
+{
+    (void)imu;
+    (void)attitude;
+    (void)dt_s;
+    if (altitude == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    *altitude = s_mock_altitude;
+    altitude->timestamp_ms = timestamp_ms;
     return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
 }
 
@@ -296,6 +312,7 @@ int main(void)
     if (App_SchedulerInit() != FC_STATUS_OK) { return 1; }
     if (App_SafetyInit() != FC_STATUS_OK) { return 2; }
     App_SafetySetInitializationResult(true);
+    if (App_CommandMuxInit() != FC_STATUS_OK) { return 35; }
     if (App_FlightInit() != FC_STATUS_OK) { return 3; }
     if (App_FlightGetState() != FC_STATE_STOP) { return 4; }
     if (App_FlightGetMode() != FC_MODE_STABILIZE) { return 5; }

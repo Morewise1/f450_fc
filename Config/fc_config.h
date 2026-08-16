@@ -59,6 +59,16 @@
 #define FC_RC_THROTTLE_EXPO                 0.30f
 #define FC_RC_MAX_CLIMB_RATE_MPS             2.0f
 
+/*
+ * USART6/ESP telemetry is always available.  Remote motor control remains
+ * disabled until the link timeout, dead-man switch, disarm, and emergency
+ * stop paths have all passed no-prop tests.
+ */
+#ifndef FC_ENABLE_APP_CONTROL
+#define FC_ENABLE_APP_CONTROL                 0U
+#endif
+#define FC_APP_CONTROL_TIMEOUT_MS           150U
+
 #define FC_THROTTLE_CURVE_MODE_LINEAR         0U
 #define FC_THROTTLE_CURVE_MODE_EXPO           1U
 #ifndef FC_THROTTLE_CURVE_MODE
@@ -138,7 +148,7 @@
 #define FC_MAG_BODY_Y_SOURCE                        1U
 #define FC_MAG_BODY_Z_SOURCE                        2U
 #define FC_MAG_BODY_X_SIGN                         1.0f
-#define FC_MAG_BODY_Y_SIGN                         1.0f
+#define FC_MAG_BODY_Y_SIGN                         -1.0f
 #define FC_MAG_BODY_Z_SIGN                         1.0f
 #define FC_MAG_OFFSET_X_UT                         0.0f
 #define FC_MAG_OFFSET_Y_UT                         0.0f
@@ -152,16 +162,20 @@
 #define FC_MAG_CAL_MIN_AXIS_SPAN_UT               20.0f
 
 /*
- * Keep magnetic yaw correction disabled until axis direction, full-rotation
- * calibration, and motor-current interference have been verified on hardware.
- * The fusion implementation is present; set this to 1U only after those tests.
+ * Gyroscope integration remains the primary yaw source.  When enabled, the
+ * magnetometer contributes only bounded low-frequency drift correction and is
+ * automatically rejected if its horizontal projection becomes unreliable.
  */
 #ifndef FC_ENABLE_MAG_YAW_FUSION
-#define FC_ENABLE_MAG_YAW_FUSION                    0U
+#define FC_ENABLE_MAG_YAW_FUSION                    1U
 #endif
 #define FC_MAG_YAW_KP                               0.8f
 #define FC_MAG_YAW_MAX_CORRECTION_DPS              20.0f
 #define FC_MAG_DATA_TIMEOUT_MS                     100U
+#define FC_MAG_MIN_HORIZONTAL_FIELD_UT               5.0f
+#define FC_MAG_MIN_HORIZONTAL_RATIO                  0.10f
+#define FC_MAG_YAW_MAX_TILT_DEG                     70.0f
+#define FC_MAG_YAW_ERROR_REJECT_DEG                 45.0f
 
 /*
  * BMP388 pressure-filter profile.  This changes only the barometer path;
@@ -208,6 +222,34 @@
 #define FC_BARO_REFERENCE_SAMPLE_COUNT             500U
 #define FC_BARO_MAX_SAMPLE_STEP_M                    1.5f
 #define FC_BARO_INNOVATION_LIMIT_M                   2.0f
+
+/*
+ * Relative-altitude estimator selection.
+ *
+ * COMPLEMENTARY preserves the original 50 Hz fixed-blend estimator.
+ * KALMAN (default) predicts height/vertical speed/accelerometer bias from the
+ * 250 Hz BMI088 path and corrects those states whenever a fresh 50 Hz BMP388
+ * sample arrives.  The controller API is identical in both modes.
+ */
+#define FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY          0U
+#define FC_ALT_ESTIMATOR_MODE_KALMAN                 1U
+#ifndef FC_ALT_ESTIMATOR_MODE
+#define FC_ALT_ESTIMATOR_MODE FC_ALT_ESTIMATOR_MODE_KALMAN
+#endif
+
+/* Three-state Kalman tuning: [height, vertical speed, vertical accel bias]. */
+#define FC_ALT_KF_BARO_STD_M                          0.35f
+#define FC_ALT_KF_ACCEL_STD_MPS2                      1.50f
+#define FC_ALT_KF_ACCEL_BIAS_RW_MPS2_SQRT_S           0.03f
+#define FC_ALT_KF_INITIAL_HEIGHT_STD_M                 0.50f
+#define FC_ALT_KF_INITIAL_VELOCITY_STD_MPS             0.75f
+#define FC_ALT_KF_INITIAL_BIAS_STD_MPS2                0.30f
+#define FC_ALT_KF_MAX_ACCEL_BIAS_MPS2                  1.50f
+#define FC_ALT_KF_INNOVATION_GATE_SIGMA                4.0f
+#define FC_ALT_KF_MIN_INNOVATION_GATE_M                0.75f
+#define FC_ALT_KF_MIN_VARIANCE                         0.000001f
+#define FC_ALT_KF_MAX_VARIANCE                      1000.0f
+
 #define FC_VERTICAL_BARO_POSITION_BLEND              0.5f
 #define FC_VERTICAL_BARO_VELOCITY_BLEND              0.48f
 #define FC_VERTICAL_ACCEL_MIN_NORM_SQ                 0.36f
@@ -254,8 +296,17 @@
 #error "FC_ENABLE_BATTERY_MONITOR must be 0 or 1"
 #endif
 
+#if FC_ENABLE_APP_CONTROL > 1U
+#error "FC_ENABLE_APP_CONTROL must be 0 or 1"
+#endif
+
 #if FC_ENABLE_MAG_YAW_FUSION > 1U
 #error "FC_ENABLE_MAG_YAW_FUSION must be 0 or 1"
+#endif
+
+#if (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY) && \
+    (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_KALMAN)
+#error "FC_ALT_ESTIMATOR_MODE is invalid"
 #endif
 
 #if (FC_MAG_BODY_X_SOURCE > 2U) || (FC_MAG_BODY_Y_SOURCE > 2U) || \
