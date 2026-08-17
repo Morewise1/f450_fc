@@ -89,13 +89,6 @@ typedef struct
 
 typedef struct
 {
-    float distance_m;
-    uint32_t timestamp_ms;
-    bool valid;
-} FcRangeData_t;
-
-typedef struct
-{
     float altitude_m;
     float vertical_velocity_mps;
     uint32_t timestamp_ms;

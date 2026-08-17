@@ -4,7 +4,7 @@
 
 ## 当前结果
 
-当前具备裸机 cooperative scheduler、安全状态机、i-BUS、BMI088 SPI、4 路标准 PWM ESC、PID、Quad-X mixer、CMake 构建和主机端测试。
+当前具备裸机 cooperative scheduler、安全状态机、i-BUS、BMI088、BMP388、MMC5983MA、4 路标准 PWM ESC、PID、Quad-X mixer、CMake 构建和主机端测试。
 
 - scheduler 由 1 ms tick 释放 500/250/100/50/10 Hz 标志。
 - 初始状态为 STOP，安全条件通过后依次进入 READY、RUNNING。
@@ -14,9 +14,9 @@
 - App 通过独立输出许可控制解锁，BSP 不解释飞行状态。
 - 未解锁、初始化失败、传感器无效和急停时保持四路 1000 us。
 - BMI088 支持双芯片 ID、物理单位换算、轴映射和非阻塞陀螺校准。
-- BMP390、VL53L1X、电池 ADC 和调试 UART 仍为 stub；首飞配置默认关闭电池监测。
-- ALT_HOLD 只有状态机和接口，当前不能进行实机定高飞行。
-- 不包含 FreeRTOS、光流、GPS 或磁力计逻辑。
+- BMP388与BMI088已接入相对高度卡尔曼估计，ALT_HOLD仍需按检查表完成实机调参。
+- MMC5983MA已接入航向融合；磁力计异常时自动退回陀螺积分。
+- 不包含 FreeRTOS、光流、GPS或独立测距高度源；首飞配置默认关闭电池ADC监测。
 
 ## 编译验证
 
@@ -40,7 +40,7 @@ ctest --test-dir build --output-on-failure
 1. 用具体 STM32F407 型号生成 HAL 工程。
 2. 在 `main.c` 中调用 `App_Init()` 与 `App_Loop()`。
 3. 1 ms 定时器的 `HAL_TIM_PeriodElapsedCallback()` 只调用 `App_Scheduler1msTick()`。
-4. SPI1 生成 `hspi1`，并分别配置 BMI088 加速度计和陀螺仪 CS。
+4. 按 `Docs/hardware_wiring.md` 配置BMI088和两条独立软件I2C总线。
 5. 配置四路 PWM，在 `fc_board.h` 映射 TIM 句柄、通道和计数频率。
 6. 启用 `FC_USE_STM32_HAL=1` 后先完成无桨波形测试。
 

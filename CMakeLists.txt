@@ -22,10 +22,8 @@ set(FC_SOURCES
     Drivers/Sensors/drv_bmi088.c
     Drivers/Sensors/drv_bmp388.c
     Drivers/Sensors/drv_mmc5983ma.c
-    Drivers/Sensors/drv_vl53l1x.c
     Estimator/est_attitude.c
     Estimator/est_altitude.c
-    Estimator/est_inertial_nav.c
     Control/ctl_pid.c
     Control/ctl_mixer.c
     Control/ctl_rate.c

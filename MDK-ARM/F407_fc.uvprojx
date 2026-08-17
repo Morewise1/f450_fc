@@ -888,11 +888,6 @@
               <FileType>1</FileType>
               <FilePath>..\Estimator\est_attitude.c</FilePath>
             </File>
-            <File>
-              <FileName>est_inertial_nav.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Estimator\est_inertial_nav.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -922,11 +917,6 @@
               <FileName>drv_mmc5983ma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Drivers\Sensors\drv_mmc5983ma.c</FilePath>
-            </File>
-            <File>
-              <FileName>drv_vl53l1x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\Sensors\drv_vl53l1x.c</FilePath>
             </File>
           </Files>
         </Group>

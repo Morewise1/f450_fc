@@ -17,10 +17,8 @@
 #include "drv_bmp388.h"
 #include "drv_ibus.h"
 #include "drv_mmc5983ma.h"
-#include "drv_vl53l1x.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
-#include "est_inertial_nav.h"
 #include "fc_link_service.h"
 
 static FcStatus_t s_status = FC_STATUS_NOT_INITIALIZED;
@@ -66,11 +64,9 @@ FcStatus_t App_MainInit(void)
     /* Optional navigation sensors never block manual-flight arming. */
     (void)Drv_Bmp388_Init();
     (void)Drv_Mmc5983ma_Init();
-    (void)Drv_Vl53l1x_Init();
 
     record_failure(Est_AttitudeInit());
     (void)Est_AltitudeInit();
-    (void)Est_InertialNavInit();
     record_failure(Ctl_RateInit());
     record_failure(Ctl_AttitudeInit());
     (void)Ctl_AltitudeInit();

@@ -44,12 +44,10 @@
 "f407_fc\ctl_rc_map.o"
 "f407_fc\est_altitude.o"
 "f407_fc\est_attitude.o"
-"f407_fc\est_inertial_nav.o"
 "f407_fc\drv_ibus.o"
 "f407_fc\drv_bmi088.o"
 "f407_fc\drv_bmp388.o"
 "f407_fc\drv_mmc5983ma.o"
-"f407_fc\drv_vl53l1x.o"
 --strict --scatter "F407_fc\F407_fc.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

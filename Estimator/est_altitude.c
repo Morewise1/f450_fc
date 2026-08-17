@@ -1,4 +1,4 @@
-/* BMP388/BMI088 relative-altitude estimators: fixed-blend or three-state KF. */
+/* BMP388/BMI088相对高度估计：可切换互补滤波或三状态卡尔曼。 */
 
 #include <math.h>
 #include <stddef.h>
@@ -20,6 +20,7 @@ typedef struct
     float reference_pressure_pa;
     float reference_acceleration_sum_mps2;
     float filtered_pressure_pa;
+    float filtered_vertical_acceleration_mps2;
     float altitude_m;
     float vertical_velocity_mps;
     float last_barometer_altitude_m;
@@ -34,11 +35,16 @@ typedef struct
     bool reference_ready;
     bool state_ready;
     bool barometer_velocity_ready;
+    bool vertical_acceleration_filter_ready;
+    bool altitude_range_fault_active;
+    bool velocity_range_fault_active;
+    bool aircraft_grounded_last_update;
 } AltitudeEstimatorState_t;
 
 static AltitudeEstimatorState_t s_state;
 volatile EstAltitudeDebug_t g_est_altitude_debug;
 
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
 static float clamp_float(float value, float minimum, float maximum)
 {
     if (value < minimum) { return minimum; }
@@ -46,7 +52,6 @@ static float clamp_float(float value, float minimum, float maximum)
     return value;
 }
 
-#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
 static float square_float(float value)
 {
     return value * value;
@@ -59,6 +64,14 @@ static float low_pass_alpha(float cutoff_hz, float dt_s)
     return dt_s / (rc_s + dt_s);
 }
 
+#if FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING
+static float time_constant_alpha(float time_constant_s, float dt_s)
+{
+    if ((time_constant_s <= 0.0f) || (dt_s <= 0.0f)) { return 1.0f; }
+    return dt_s / (time_constant_s + dt_s);
+}
+#endif
+
 static float pressure_to_relative_altitude(float pressure_pa)
 {
     float ratio = pressure_pa / s_state.reference_pressure_pa;
@@ -66,9 +79,9 @@ static float pressure_to_relative_altitude(float pressure_pa)
            (1.0f - powf(ratio, PRESSURE_ALTITUDE_EXPONENT));
 }
 
-static bool vertical_acceleration(const FcImuData_t *imu,
-                                  const FcAttitude_t *attitude,
-                                  float *acceleration_mps2)
+static bool calculate_vertical_acceleration(const FcImuData_t *imu,
+                                            const FcAttitude_t *attitude,
+                                            float *acceleration_mps2)
 {
     float roll_rad;
     float pitch_rad;
@@ -90,6 +103,8 @@ static bool vertical_acceleration(const FcImuData_t *imu,
     if ((accel_norm_sq < FC_VERTICAL_ACCEL_MIN_NORM_SQ) ||
         (accel_norm_sq > FC_VERTICAL_ACCEL_MAX_NORM_SQ))
     {
+        ++g_est_altitude_debug.acceleration_reject_count;
+        g_est_altitude_debug.last_reject_reason = EST_ALT_REJECT_ACCEL_NORM;
         return false;
     }
 
@@ -104,11 +119,52 @@ static bool vertical_acceleration(const FcImuData_t *imu,
     specific_force_down_g = (-sin_pitch * imu->accel_g.x) +
                             (sin_roll * cos_pitch * imu->accel_g.y) +
                             (cos_roll * cos_pitch * imu->accel_g.z);
-    *acceleration_mps2 = clamp_float(-(specific_force_down_g + 1.0f) *
-                                     FC_GRAVITY_MPS2,
-                                     -FC_VERTICAL_ACCEL_LIMIT_MPS2,
-                                     FC_VERTICAL_ACCEL_LIMIT_MPS2);
+    *acceleration_mps2 = -(specific_force_down_g + 1.0f) * FC_GRAVITY_MPS2;
+    g_est_altitude_debug.raw_vertical_acceleration_mps2 = *acceleration_mps2;
+    if ((*acceleration_mps2 != *acceleration_mps2) ||
+        (fabsf(*acceleration_mps2) > FC_ALT_MAX_TRUSTED_ACCEL_MPS2))
+    {
+        ++g_est_altitude_debug.acceleration_reject_count;
+        g_est_altitude_debug.last_reject_reason = EST_ALT_REJECT_ACCEL_RANGE;
+        return false;
+    }
     return true;
+}
+
+static float filter_vertical_acceleration(float acceleration_mps2, float dt_s)
+{
+#if FC_ALT_ENABLE_ACCEL_LPF
+    float alpha;
+
+    if (!s_state.vertical_acceleration_filter_ready)
+    {
+        s_state.filtered_vertical_acceleration_mps2 = acceleration_mps2;
+        s_state.vertical_acceleration_filter_ready = true;
+        return acceleration_mps2;
+    }
+    alpha = low_pass_alpha(FC_ALT_ACCEL_LPF_HZ, dt_s);
+    s_state.filtered_vertical_acceleration_mps2 += alpha *
+        (acceleration_mps2 - s_state.filtered_vertical_acceleration_mps2);
+    return s_state.filtered_vertical_acceleration_mps2;
+#else
+    (void)dt_s;
+    s_state.filtered_vertical_acceleration_mps2 = acceleration_mps2;
+    s_state.vertical_acceleration_filter_ready = true;
+    return acceleration_mps2;
+#endif
+}
+
+static void update_ground_reference(float pressure_pa, float dt_s)
+{
+#if FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING
+    float alpha = time_constant_alpha(FC_ALT_GROUND_REFERENCE_TIME_CONSTANT_S,
+                                      dt_s);
+    s_state.reference_pressure_pa += alpha *
+        (pressure_pa - s_state.reference_pressure_pa);
+#else
+    (void)pressure_pa;
+    (void)dt_s;
+#endif
 }
 
 static bool barometer_is_recent(uint32_t timestamp_ms)
@@ -126,15 +182,48 @@ static void synchronize_output_state(void)
 #endif
 }
 
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY
+static void apply_ground_constraint(void)
+{
+    s_state.altitude_m = 0.0f;
+    s_state.vertical_velocity_mps = 0.0f;
+}
+#endif
+
 static void write_output(uint32_t timestamp_ms, FcAltitude_t *altitude)
 {
     bool recent = barometer_is_recent(timestamp_ms);
+    bool altitude_safe;
+    bool velocity_safe;
 
     synchronize_output_state();
+    altitude_safe = (s_state.altitude_m == s_state.altitude_m) &&
+                    (s_state.altitude_m >= FC_ALT_ESTIMATE_MIN_M) &&
+                    (s_state.altitude_m <= FC_ALT_ESTIMATE_MAX_M);
+    velocity_safe = (s_state.vertical_velocity_mps ==
+                     s_state.vertical_velocity_mps) &&
+                    (fabsf(s_state.vertical_velocity_mps) <=
+                     FC_ALT_MAX_ESTIMATED_VELOCITY_MPS);
+    if (!altitude_safe && !s_state.altitude_range_fault_active)
+    {
+        ++g_est_altitude_debug.altitude_range_fault_count;
+        g_est_altitude_debug.last_reject_reason =
+            EST_ALT_REJECT_ALTITUDE_RANGE;
+    }
+    if (!velocity_safe && !s_state.velocity_range_fault_active)
+    {
+        ++g_est_altitude_debug.velocity_range_fault_count;
+        g_est_altitude_debug.last_reject_reason =
+            EST_ALT_REJECT_VELOCITY_RANGE;
+    }
+    s_state.altitude_range_fault_active = !altitude_safe;
+    s_state.velocity_range_fault_active = !velocity_safe;
+
     altitude->altitude_m = s_state.altitude_m;
     altitude->vertical_velocity_mps = s_state.vertical_velocity_mps;
     altitude->timestamp_ms = timestamp_ms;
-    altitude->valid = s_state.state_ready && recent;
+    altitude->valid = s_state.state_ready && recent &&
+                      altitude_safe && velocity_safe;
 
     g_est_altitude_debug.reference_pressure_pa = s_state.reference_pressure_pa;
     g_est_altitude_debug.filtered_pressure_pa = s_state.filtered_pressure_pa;
@@ -144,6 +233,7 @@ static void write_output(uint32_t timestamp_ms, FcAltitude_t *altitude)
         s_state.last_valid_barometer_ms;
     g_est_altitude_debug.reference_ready = s_state.reference_ready;
     g_est_altitude_debug.barometer_recent = recent;
+    g_est_altitude_debug.estimate_within_limits = altitude_safe && velocity_safe;
 #if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
     g_est_altitude_debug.acceleration_bias_mps2 =
         s_state.kalman_state[KF_ACCEL_BIAS_INDEX];
@@ -282,14 +372,26 @@ static bool kalman_correct(float barometer_altitude_m, float *innovation_m)
     float prior_covariance[KF_STATE_COUNT][KF_STATE_COUNT];
     float gain[KF_STATE_COUNT];
     float measurement_variance = square_float(FC_ALT_KF_BARO_STD_M);
+    float predicted_measurement_m =
+        s_state.kalman_state[KF_HEIGHT_INDEX];
     float innovation_variance;
     float innovation_gate_m;
     float covariance_symmetric;
     uint8_t row;
     uint8_t column;
 
-    *innovation_m = barometer_altitude_m -
-                    s_state.kalman_state[KF_HEIGHT_INDEX];
+#if FC_ALT_ENABLE_BARO_DELAY_COMPENSATION
+    /*
+     * 延迟气压高度约为h(t)-delay*v(t)。使用先验速度前推创新，
+     * 但保持高度观测矩阵[1,0,0]，避免无GPS模型直接反向修正速度。
+     */
+    predicted_measurement_m -= FC_ALT_BARO_DELAY_S *
+                               s_state.kalman_state[KF_VELOCITY_INDEX];
+#endif
+    *innovation_m = barometer_altitude_m - predicted_measurement_m;
+    g_est_altitude_debug.predicted_barometer_altitude_m =
+        predicted_measurement_m;
+
     innovation_variance =
         s_state.kalman_covariance[KF_HEIGHT_INDEX][KF_HEIGHT_INDEX] +
         measurement_variance;
@@ -373,9 +475,7 @@ static bool complementary_correct(float barometer_altitude_m,
         predicted_velocity_mps += acceleration_mps2 * dt_s;
     }
     *innovation_m = barometer_altitude_m - predicted_altitude_m;
-    if ((fabsf(barometer_altitude_m - s_state.altitude_m) >
-         FC_BARO_MAX_SAMPLE_STEP_M) ||
-        (fabsf(*innovation_m) > FC_BARO_INNOVATION_LIMIT_M))
+    if (fabsf(*innovation_m) > FC_BARO_INNOVATION_LIMIT_M)
     {
         s_state.altitude_m = predicted_altitude_m;
         s_state.vertical_velocity_mps = predicted_velocity_mps;
@@ -422,7 +522,10 @@ FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
                                FcAltitude_t *altitude)
 {
     float acceleration_mps2 = 0.0f;
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
+    float raw_acceleration_mps2 = 0.0f;
     bool acceleration_valid;
+#endif
 
     if ((altitude == NULL) || (dt_s <= 0.0f) ||
         (dt_s > FC_VERTICAL_MAX_PREDICT_DT_S))
@@ -434,17 +537,22 @@ FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
     if (!s_state.initialized) { return FC_STATUS_NOT_INITIALIZED; }
     if (!s_state.reference_ready) { return FC_STATUS_BUSY; }
 
-    acceleration_valid = vertical_acceleration(imu, attitude,
-                                                &acceleration_mps2);
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
+    acceleration_valid = calculate_vertical_acceleration(
+        imu, attitude, &raw_acceleration_mps2);
+    if (acceleration_valid)
+    {
+        acceleration_mps2 = filter_vertical_acceleration(
+            raw_acceleration_mps2, dt_s);
+    }
     g_est_altitude_debug.vertical_acceleration_mps2 = acceleration_mps2;
     g_est_altitude_debug.inertial_aiding_active = acceleration_valid;
-
-#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
     kalman_predict(acceleration_mps2, acceleration_valid, dt_s);
     ++g_est_altitude_debug.prediction_count;
 #else
+    (void)imu;
+    (void)attitude;
     (void)acceleration_mps2;
-    (void)acceleration_valid;
 #endif
     s_state.last_update_ms = timestamp_ms;
     write_output(timestamp_ms, altitude);
@@ -455,13 +563,17 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
                               const FcImuData_t *imu,
                               const FcAttitude_t *attitude,
                               float dt_s,
+                              bool aircraft_grounded,
                               FcAltitude_t *altitude)
 {
     uint32_t timestamp_ms;
     bool barometer_valid;
     bool acceleration_valid;
     bool correction_accepted = false;
+    bool correction_applied = false;
+    bool takeoff_reference_freeze = false;
     float acceleration_mps2 = 0.0f;
+    float raw_acceleration_mps2 = 0.0f;
     float barometer_altitude_m = 0.0f;
     float pressure_alpha;
     float innovation_m = 0.0f;
@@ -480,10 +592,29 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
     barometer_valid = barometer->valid &&
                       (barometer->pressure_pa >= 30000.0f) &&
                       (barometer->pressure_pa <= 125000.0f);
-    acceleration_valid = vertical_acceleration(imu, attitude,
-                                                &acceleration_mps2);
-    g_est_altitude_debug.vertical_acceleration_mps2 = acceleration_mps2;
-    g_est_altitude_debug.inertial_aiding_active = acceleration_valid;
+    acceleration_valid = false;
+    if (!s_state.reference_ready)
+    {
+        acceleration_valid = calculate_vertical_acceleration(
+            imu, attitude, &raw_acceleration_mps2);
+        acceleration_mps2 = raw_acceleration_mps2;
+        g_est_altitude_debug.vertical_acceleration_mps2 = acceleration_mps2;
+        g_est_altitude_debug.inertial_aiding_active = acceleration_valid;
+    }
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY
+    else
+    {
+        acceleration_valid = calculate_vertical_acceleration(
+            imu, attitude, &raw_acceleration_mps2);
+        if (acceleration_valid)
+        {
+            acceleration_mps2 = filter_vertical_acceleration(
+                raw_acceleration_mps2, dt_s);
+        }
+        g_est_altitude_debug.vertical_acceleration_mps2 = acceleration_mps2;
+        g_est_altitude_debug.inertial_aiding_active = acceleration_valid;
+    }
+#endif
 
     if (!s_state.reference_ready)
     {
@@ -499,6 +630,10 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
             s_state.reference_sample_count;
         if (s_state.reference_sample_count < FC_BARO_REFERENCE_SAMPLE_COUNT)
         {
+            if (aircraft_grounded)
+            {
+                s_state.aircraft_grounded_last_update = true;
+            }
             return FC_STATUS_BUSY;
         }
 
@@ -525,40 +660,104 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
 #endif
     }
 
+    g_est_altitude_debug.ground_reference_tracking_active =
+        aircraft_grounded && barometer_valid &&
+        (FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING != 0U);
+    if (g_est_altitude_debug.ground_reference_tracking_active)
+    {
+        update_ground_reference(barometer->pressure_pa, dt_s);
+    }
+
     if (barometer_valid)
     {
         pressure_alpha = low_pass_alpha(FC_BARO_PRESSURE_LPF_HZ, dt_s);
         s_state.filtered_pressure_pa += pressure_alpha *
             (barometer->pressure_pa - s_state.filtered_pressure_pa);
+        takeoff_reference_freeze =
+            (FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING != 0U) &&
+            s_state.aircraft_grounded_last_update && !aircraft_grounded;
+        if (takeoff_reference_freeze)
+        {
+            /* 在真正离地的第一个有效气压样本冻结零面，消除预热慢漂残差。 */
+            s_state.reference_pressure_pa = s_state.filtered_pressure_pa;
+        }
         barometer_altitude_m =
             pressure_to_relative_altitude(s_state.filtered_pressure_pa);
 
 #if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
-        if ((!s_state.barometer_velocity_ready ||
-             (fabsf(barometer_altitude_m -
-                    s_state.last_barometer_altitude_m) <=
-              FC_BARO_MAX_SAMPLE_STEP_M)) &&
-            kalman_correct(barometer_altitude_m, &innovation_m))
+        if (aircraft_grounded || takeoff_reference_freeze)
         {
             s_state.last_barometer_altitude_m = barometer_altitude_m;
             s_state.barometer_velocity_ready = true;
             correction_accepted = true;
         }
+        else if (s_state.barometer_velocity_ready &&
+            (fabsf(barometer_altitude_m -
+                   s_state.last_barometer_altitude_m) >
+             FC_BARO_MAX_SAMPLE_STEP_M))
+        {
+            ++g_est_altitude_debug.barometer_step_reject_count;
+            g_est_altitude_debug.last_reject_reason =
+                EST_ALT_REJECT_BARO_STEP;
+        }
+        else if (kalman_correct(barometer_altitude_m, &innovation_m))
+        {
+            s_state.last_barometer_altitude_m = barometer_altitude_m;
+            s_state.barometer_velocity_ready = true;
+            correction_accepted = true;
+            correction_applied = true;
+        }
+        else
+        {
+            ++g_est_altitude_debug.barometer_innovation_reject_count;
+            g_est_altitude_debug.last_reject_reason =
+                EST_ALT_REJECT_BARO_INNOVATION;
+        }
 #else
-        correction_accepted = complementary_correct(barometer_altitude_m,
-                                                      acceleration_mps2,
-                                                      acceleration_valid,
-                                                      dt_s,
-                                                      &innovation_m);
+        if (aircraft_grounded || takeoff_reference_freeze)
+        {
+            s_state.last_barometer_altitude_m = barometer_altitude_m;
+            s_state.barometer_velocity_ready = true;
+            correction_accepted = true;
+        }
+        else if (s_state.barometer_velocity_ready &&
+            (fabsf(barometer_altitude_m -
+                   s_state.last_barometer_altitude_m) >
+             FC_BARO_MAX_SAMPLE_STEP_M))
+        {
+            ++g_est_altitude_debug.barometer_step_reject_count;
+            g_est_altitude_debug.last_reject_reason =
+                EST_ALT_REJECT_BARO_STEP;
+        }
+        else
+        {
+            correction_accepted = complementary_correct(barometer_altitude_m,
+                                                          acceleration_mps2,
+                                                          acceleration_valid,
+                                                          dt_s,
+                                                          &innovation_m);
+            correction_applied = correction_accepted;
+            if (!correction_accepted)
+            {
+                ++g_est_altitude_debug.barometer_innovation_reject_count;
+                g_est_altitude_debug.last_reject_reason =
+                    EST_ALT_REJECT_BARO_INNOVATION;
+            }
+        }
 #endif
         if (correction_accepted)
         {
             s_state.last_valid_barometer_ms = timestamp_ms;
-            ++g_est_altitude_debug.correction_count;
+            if (correction_applied)
+            {
+                ++g_est_altitude_debug.correction_count;
+            }
+            g_est_altitude_debug.consecutive_barometer_reject_count = 0U;
         }
         else
         {
             ++g_est_altitude_debug.rejected_sample_count;
+            ++g_est_altitude_debug.consecutive_barometer_reject_count;
         }
     }
 #if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY
@@ -574,6 +773,24 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
     }
 #endif
 
+    if (aircraft_grounded && s_state.reference_ready)
+    {
+#if FC_ALT_ESTIMATOR_MODE == FC_ALT_ESTIMATOR_MODE_KALMAN
+        float ground_acceleration_bias_mps2 =
+            s_state.kalman_state[KF_ACCEL_BIAS_INDEX];
+        initialize_kalman(ground_acceleration_bias_mps2);
+#else
+        apply_ground_constraint();
+#endif
+    }
+    if (aircraft_grounded)
+    {
+        s_state.aircraft_grounded_last_update = true;
+    }
+    else if (barometer_valid)
+    {
+        s_state.aircraft_grounded_last_update = false;
+    }
     s_state.last_update_ms = timestamp_ms;
     g_est_altitude_debug.raw_altitude_m = barometer_altitude_m;
     g_est_altitude_debug.barometer_innovation_m = innovation_m;

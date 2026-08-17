@@ -35,9 +35,9 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
 I (../App/app_main.h)(0x6A564AE0)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../App/app_scheduler.h)(0x6A5743C4)
 I (../BSP/bsp_esp_uart.h)(0x6A81394C)
 I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
@@ -742,15 +742,15 @@ F (..\App\app_command_mux.c)(0x6A813948)(--c99 -c --cpu Cortex-M4.fp -g -O3 --ap
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\App\app_command_mux.h)(0x6A813945)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
-F (..\App\app_flight.c)(0x6A813A3B)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_flight.o --omf_browse f407_fc\app_flight.crf --depend f407_fc\app_flight.d)
+I (../Config/fc_config.h)(0x6A81F01A)
+F (..\App\app_flight.c)(0x6A81DEBB)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_flight.o --omf_browse f407_fc\app_flight.crf --depend f407_fc\app_flight.d)
 I (..\App\app_flight.h)(0x6A73F62E)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\App\app_command_mux.h)(0x6A813945)
 I (..\App\app_safety.h)(0x6A5743CB)
 I (..\App\app_scheduler.h)(0x6A5743C4)
@@ -767,15 +767,14 @@ I (../Drivers/Sensors/drv_bmp388.h)(0x6A7FD699)
 I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (../Drivers/Sensors/drv_mmc5983ma.h)(0x6A7BF32E)
-I (../Estimator/est_altitude.h)(0x6A812B84)
+I (../Estimator/est_altitude.h)(0x6A81DD3C)
 I (../Estimator/est_attitude.h)(0x6A8120EF)
-I (../Estimator/est_inertial_nav.h)(0x6A7DCEB8)
-F (..\App\app_main.c)(0x6A813A38)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_main.o --omf_browse f407_fc\app_main.crf --depend f407_fc\app_main.d)
+F (..\App\app_main.c)(0x6A81DEBD)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_main.o --omf_browse f407_fc\app_main.crf --depend f407_fc\app_main.d)
 I (..\App\app_main.h)(0x6A564AE0)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\App\app_command_mux.h)(0x6A813945)
 I (..\App\app_flight.h)(0x6A73F62E)
 I (..\App\app_safety.h)(0x6A5743CB)
@@ -794,25 +793,23 @@ I (../Drivers/Sensors/drv_bmi088.h)(0x6A6857C9)
 I (../Drivers/Sensors/drv_bmp388.h)(0x6A7FD699)
 I (../Drivers/Radio/drv_ibus.h)(0x6A56D8B0)
 I (../Drivers/Sensors/drv_mmc5983ma.h)(0x6A7BF32E)
-I (../Drivers/Sensors/drv_vl53l1x.h)(0x6A564BB3)
-I (../Estimator/est_altitude.h)(0x6A812B84)
+I (../Estimator/est_altitude.h)(0x6A81DD3C)
 I (../Estimator/est_attitude.h)(0x6A8120EF)
-I (../Estimator/est_inertial_nav.h)(0x6A7DCEB8)
 I (../Communication/fc_link_service.h)(0x6A813A13)
 F (..\App\app_safety.c)(0x6A6DB0CB)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_safety.o --omf_browse f407_fc\app_safety.crf --depend f407_fc\app_safety.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\App\app_safety.h)(0x6A5743CB)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\App\app_scheduler.c)(0x6A5743C7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\app_scheduler.o --omf_browse f407_fc\app_scheduler.crf --depend f407_fc\app_scheduler.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\App\app_scheduler.h)(0x6A5743C4)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
 I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
@@ -847,30 +844,30 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
 F (..\BSP\bsp_battery_adc.c)(0x6A564B41)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_battery_adc.o --omf_browse f407_fc\bsp_battery_adc.crf --depend f407_fc\bsp_battery_adc.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\BSP\bsp_battery_adc.h)(0x6A564B3E)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\BSP\bsp_buzzer.c)(0x6A564B3A)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_buzzer.o --omf_browse f407_fc\bsp_buzzer.crf --depend f407_fc\bsp_buzzer.d)
 I (..\BSP\bsp_buzzer.h)(0x6A564B37)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\BSP\bsp_debug_uart.c)(0x6A564B49)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_debug_uart.o --omf_browse f407_fc\bsp_debug_uart.crf --depend f407_fc\bsp_debug_uart.d)
 I (..\BSP\bsp_debug_uart.h)(0x6A564B45)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\BSP\bsp_esc_pwm.c)(0x6A6324AC)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_esc_pwm.o --omf_browse f407_fc\bsp_esc_pwm.crf --depend f407_fc\bsp_esc_pwm.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\BSP\bsp_esc_pwm.h)(0x6A6324A9)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
@@ -909,8 +906,8 @@ I (E:\Keil_v5\ARM\ARMCC\include\string.h)(0x5475F300)
 I (..\BSP\bsp_esp_uart.h)(0x6A81394C)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
 I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6A685CED)
@@ -945,16 +942,16 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
 F (..\BSP\bsp_led.c)(0x6A564B34)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_led.o --omf_browse f407_fc\bsp_led.crf --depend f407_fc\bsp_led.d)
 I (..\BSP\bsp_led.h)(0x6A564B30)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\BSP\bsp_soft_i2c.c)(0x6A7E92C6)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\bsp_soft_i2c.o --omf_browse f407_fc\bsp_soft_i2c.crf --depend f407_fc\bsp_soft_i2c.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\BSP\bsp_soft_i2c.h)(0x6A7E92C3)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
@@ -993,16 +990,16 @@ I (..\Communication\fc_link_protocol.h)(0x6A8139B2)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\Communication\fc_link_service.c)(0x6A813A16)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\fc_link_service.o --omf_browse f407_fc\fc_link_service.crf --depend f407_fc\fc_link_service.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\string.h)(0x5475F300)
 I (..\Communication\fc_link_service.h)(0x6A813A13)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\Communication\fc_link_protocol.h)(0x6A8139B2)
 I (../App/app_command_mux.h)(0x6A813945)
 I (../App/app_flight.h)(0x6A73F62E)
@@ -1012,25 +1009,25 @@ F (..\Control\ctl_altitude.c)(0x6A7BF3EE)(--c99 -c --cpu Cortex-M4.fp -g -O3 --a
 I (E:\Keil_v5\ARM\ARMCC\include\math.h)(0x5475F2FE)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_altitude.h)(0x6A7BF3E5)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\Control\ctl_attitude.c)(0x6A721654)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_attitude.o --omf_browse f407_fc\ctl_attitude.crf --depend f407_fc\ctl_attitude.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_attitude.h)(0x6A721628)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_params.h)(0x6A721622)
 F (..\Control\ctl_mixer.c)(0x6A71D5D4)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_mixer.o --omf_browse f407_fc\ctl_mixer.crf --depend f407_fc\ctl_mixer.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_mixer.h)(0x6A71D532)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
@@ -1067,56 +1064,48 @@ F (..\Control\ctl_pid.c)(0x6A632463)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=i
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_pid.h)(0x6A63245D)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\Control\ctl_rate.c)(0x6A6DD397)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_rate.o --omf_browse f407_fc\ctl_rate.crf --depend f407_fc\ctl_rate.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_rate.h)(0x6A632465)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\Control\ctl_pid.h)(0x6A63245D)
 I (../Config/fc_params.h)(0x6A721622)
 F (..\Control\ctl_rc_map.c)(0x6A721625)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\ctl_rc_map.o --omf_browse f407_fc\ctl_rc_map.crf --depend f407_fc\ctl_rc_map.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Control\ctl_rc_map.h)(0x6A6323E8)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
-F (..\Estimator\est_altitude.c)(0x6A812D46)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_altitude.o --omf_browse f407_fc\est_altitude.crf --depend f407_fc\est_altitude.d)
+I (../Config/fc_config.h)(0x6A81F01A)
+F (..\Estimator\est_altitude.c)(0x6A8275D3)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_altitude.o --omf_browse f407_fc\est_altitude.crf --depend f407_fc\est_altitude.d)
 I (E:\Keil_v5\ARM\ARMCC\include\math.h)(0x5475F2FE)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
-I (..\Estimator\est_altitude.h)(0x6A812B84)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (..\Estimator\est_altitude.h)(0x6A81DD3C)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\Estimator\est_attitude.c)(0x6A8120F2)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_attitude.o --omf_browse f407_fc\est_attitude.crf --depend f407_fc\est_attitude.d)
 I (E:\Keil_v5\ARM\ARMCC\include\math.h)(0x5475F2FE)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Estimator\est_attitude.h)(0x6A8120EF)
-I (../Config/fc_types.h)(0x6A79D0EB)
+I (../Config/fc_types.h)(0x6A81DFFD)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
-F (..\Estimator\est_inertial_nav.c)(0x6A7DCEBB)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\est_inertial_nav.o --omf_browse f407_fc\est_inertial_nav.crf --depend f407_fc\est_inertial_nav.d)
-I (E:\Keil_v5\ARM\ARMCC\include\math.h)(0x5475F2FE)
-I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
-I (..\Estimator\est_inertial_nav.h)(0x6A7DCEB8)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_config.h)(0x6A81F01A)
 F (..\Drivers\Radio\drv_ibus.c)(0x6A71D3D1)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_ibus.o --omf_browse f407_fc\drv_ibus.crf --depend f407_fc\drv_ibus.d)
 I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Drivers\Radio\drv_ibus.h)(0x6A56D8B0)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_params.h)(0x6A721622)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
@@ -1154,8 +1143,8 @@ I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (..\Drivers\Sensors\drv_bmi088.h)(0x6A6857C9)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x6A5CF109)
@@ -1193,8 +1182,8 @@ I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (../BSP/bsp_soft_i2c.h)(0x6A7E92C3)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\Drivers\Sensors\drv_bmp388.h)(0x6A7FD699)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
@@ -1233,8 +1222,8 @@ I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
 I (../BSP/bsp_soft_i2c.h)(0x6A7E92C3)
 I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (../Config/fc_config.h)(0x6A81602D)
+I (../Config/fc_types.h)(0x6A81DFFD)
+I (../Config/fc_config.h)(0x6A81F01A)
 I (..\Drivers\Sensors\drv_mmc5983ma.h)(0x6A7BF32E)
 I (../Config/fc_board.h)(0x6A7E9957)
 I (../Core/Inc/main.h)(0x6A685CEE)
@@ -1268,10 +1257,3 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A5CF109)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A5CF109)
-F (..\Drivers\Sensors\drv_vl53l1x.c)(0x6A564BB7)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../App -I../BSP -I../Communication -I../Config -I../Control -I../Drivers/Radio -I../Drivers/Sensors -I../Estimator-I E:\2607uav\F407_fc\MDK-ARM\RTE-I E:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I E:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F40_41xxx -DUSE_HAL_DRIVER -DSTM32F407xx -DFC_USE_STM32_HAL="1" -DFC_BOARD_HAL_BINDINGS_COMPLETE="1"-o f407_fc\drv_vl53l1x.o --omf_browse f407_fc\drv_vl53l1x.crf --depend f407_fc\drv_vl53l1x.d)
-I (E:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5475F300)
-I (..\Drivers\Sensors\drv_vl53l1x.h)(0x6A564BB3)
-I (E:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5475F300)
-I (../Config/fc_types.h)(0x6A79D0EB)
-I (E:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (../Config/fc_config.h)(0x6A81602D)

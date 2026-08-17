@@ -67,7 +67,7 @@ g_ctl_rate_debug
 App:       app_main.c app_scheduler.c app_flight.c app_safety.c
 BSP:       bsp_esc_pwm.c bsp_battery_adc.c bsp_debug_uart.c
 Radio:     drv_ibus.c
-Sensors:   drv_bmi088.c drv_bmp388.c drv_mmc5983ma.c drv_vl53l1x.c
+Sensors:   drv_bmi088.c drv_bmp388.c drv_mmc5983ma.c
 Estimator: est_attitude.c est_altitude.c
 Control:   ctl_rc_map.c ctl_pid.c ctl_rate.c ctl_attitude.c ctl_altitude.c ctl_mixer.c
 ```

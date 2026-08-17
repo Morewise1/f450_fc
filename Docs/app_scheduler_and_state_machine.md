@@ -27,10 +27,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 | 标志 | 周期 | 工作 |
 | --- | ---: | --- |
-| 500 Hz | 2 ms | QMI8658、rate PID、mixer、ESC |
+| 500 Hz | 2 ms | BMI088、rate PID、mixer、ESC |
 | 250 Hz | 4 ms | 姿态估计、attitude PID |
 | 100 Hz | 10 ms | i-BUS、battery、安全评估、状态机 |
-| 50 Hz | 20 ms | BMP390、高度估计、ALT_HOLD PID |
+| 50 Hz | 20 ms | BMP388、高度估计、ALT_HOLD PID |
 | 10 Hz | 100 ms | 有界 housekeeping、日志快照 |
 
 ISR 共享的任务位、tick、分频器和诊断计数均为 `volatile`。`App_SchedulerFetchReadyTasks()` 在短临界区中复制并清零任务位，避免 ISR 恰好在读取和清除之间释放新任务而导致丢标志。
@@ -80,7 +80,7 @@ ISR 共享的任务位、tick、分频器和诊断计数均为 `volatile`。`App
 
 ```text
 drv_ibus ----------> FcRcInput_t ---------+
-drv_qmi8658 -------> FcImuData_t ---------+--> app_safety --> output permission
+drv_bmi088 --------> FcImuData_t ---------+--> app_safety --> output permission
 bsp_battery_adc ---> FcBatteryStatus_t ----+
 est_attitude ------> FcAttitude_t --------+
 
@@ -90,10 +90,10 @@ app_flight RUNNING --> PID/mixer --> FcMotorOutput_t --> bsp_esc_pwm
 | 模块 | 调用频率 | 失败处理 |
 | --- | ---: | --- |
 | `drv_ibus` | 100 Hz | timeout/failsafe，STOP |
-| `drv_qmi8658` | 500 Hz | 本帧无效，立即 STOP |
+| `drv_bmi088` | 500 Hz | 本帧无效，立即 STOP |
 | `bsp_battery_adc` | 100 Hz | unknown/critical，STOP |
 | `est_attitude` | 250 Hz | 姿态无效，STOP |
-| `drv_bmp388`、`est_altitude` | 50 Hz | STABILIZE 禁用高度修正；ALT_HOLD 下 STOP |
+| `drv_bmp388`、`est_altitude` | 50 Hz | STABILIZE禁用高度修正；ALT_HOLD失效时退回STABILIZE |
 | `bsp_esc_pwm` | 状态转换、500 Hz | STOP/READY 1000 us；写入失败 STOP |
 
 ## 串口日志建议

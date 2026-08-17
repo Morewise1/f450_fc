@@ -88,7 +88,7 @@
 #define FC_IMU_CAL_ACCEL_MAG_MAX_SQ           1.3225f
 #define FC_IMU_BIAS_TRACK_ALPHA                0.0002f
 
-/* Software filtering after body-axis mapping and gyro bias correction. */
+/* IMU通用低通：同时服务姿态环，定高通道不要通过降低这里的频率来调试。 */
 #define FC_IMU_ACCEL_LPF_HZ                    30.0f
 #define FC_IMU_GYRO_LPF_HZ                     55.0f
 #define FC_IMU_FILTER_MAX_DT_S                   0.02f
@@ -178,21 +178,16 @@
 #define FC_MAG_YAW_ERROR_REJECT_DEG                 45.0f
 
 /*
- * BMP388 pressure-filter profile.  This changes only the barometer path;
- * BMI088 and MMC5983MA filtering remain untouched.
+ * BMP388滤波模式，只改变气压高度链路，不影响BMI088和MMC5983MA。
  *
- * FAST:
- *   BMP388 IIR coefficient 1, 5 Hz software pressure LPF, 3 Hz velocity LPF.
- *   Lowest delay; use for response checks or a well-shielded barometer.
- * BALANCED (recommended default):
- *   BMP388 IIR coefficient 3, 2 Hz pressure LPF, 1 Hz velocity LPF.
- *   Smoother default for indoor tests and a small F450.
- * STRONG:
- *   BMP388 IIR coefficient 7, 0.8 Hz pressure LPF, 0.4 Hz velocity LPF.
- *   Bench-diagnosis/very noisy-air mode.  Its delay can require altitude-loop
- *   retuning, so do not select it for a first flight.
+ * FAST：硬件IIR系数1，软件气压低通5Hz，气压速度低通3Hz。
+ *       延迟最小，用于响应检查或气压计防风良好的情况。
+ * BALANCED（默认推荐）：硬件IIR系数3，气压低通2Hz，速度低通1Hz。
+ *       适合室内调试和F450首轮低空飞行。
+ * STRONG：硬件IIR系数7，气压低通0.8Hz，速度低通0.4Hz。
+ *       只用于台架诊断或气流噪声很大时，延迟明显，不能直接首飞。
  *
- * Change FC_BARO_FILTER_MODE, rebuild the whole Keil project, and re-flash.
+ * 修改FC_BARO_FILTER_MODE后必须完整编译Keil工程并重新烧录。
  */
 #define FC_BARO_FILTER_MODE_FAST                   0U
 #define FC_BARO_FILTER_MODE_BALANCED               1U
@@ -207,7 +202,7 @@
 #define FC_BARO_VELOCITY_LPF_HZ                    3.0f
 #elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_BALANCED
 #define FC_BMP388_IIR_REGISTER_VALUE             0x04U
-#define FC_BARO_PRESSURE_LPF_HZ                    2.0f
+#define FC_BARO_PRESSURE_LPF_HZ                    4.0f
 #define FC_BARO_VELOCITY_LPF_HZ                    1.0f
 #elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_STRONG
 #define FC_BMP388_IIR_REGISTER_VALUE             0x06U
@@ -217,48 +212,81 @@
 #error "FC_BARO_FILTER_MODE must be FAST, BALANCED, or STRONG"
 #endif
 
-/* BMP388 + BMI088 relative-altitude estimator and conservative controller. */
-/* Ten seconds at 50 Hz lets the powered sensor and its local air settle. */
-#define FC_BARO_REFERENCE_SAMPLE_COUNT             500U
-#define FC_BARO_MAX_SAMPLE_STEP_M                    1.5f
-#define FC_BARO_INNOVATION_LIMIT_M                   2.0f
+/* --------------------------------------------------------------------------
+ * BMP388 + BMI088 相对高度估计
+ * -------------------------------------------------------------------------- */
 
-/*
- * Relative-altitude estimator selection.
- *
- * COMPLEMENTARY preserves the original 50 Hz fixed-blend estimator.
- * KALMAN (default) predicts height/vertical speed/accelerometer bias from the
- * 250 Hz BMI088 path and corrects those states whenever a fresh 50 Hz BMP388
- * sample arrives.  The controller API is identical in both modes.
- */
+/* 高度估计器切换：0=互补滤波（回退/对比），1=三状态卡尔曼（默认）。 */
 #define FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY          0U
 #define FC_ALT_ESTIMATOR_MODE_KALMAN                 1U
 #ifndef FC_ALT_ESTIMATOR_MODE
 #define FC_ALT_ESTIMATOR_MODE FC_ALT_ESTIMATOR_MODE_KALMAN
 #endif
 
-/* Three-state Kalman tuning: [height, vertical speed, vertical accel bias]. */
+/* 功能开关：改成0可分别关闭，便于A/B对比；修改后需完整编译并重新烧录。 */
+#ifndef FC_ALT_ENABLE_ACCEL_LPF
+#define FC_ALT_ENABLE_ACCEL_LPF                       1U
+#endif
+#ifndef FC_ALT_ENABLE_BARO_DELAY_COMPENSATION
+#define FC_ALT_ENABLE_BARO_DELAY_COMPENSATION         1U
+#endif
+#ifndef FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING
+#define FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING       1U
+#endif
+
+/* 起飞零面：50Hz下500点约为10秒；之后仅在STOP/READY继续慢速跟踪。 */
+#define FC_BARO_REFERENCE_SAMPLE_COUNT               500U
+#define FC_ALT_GROUND_REFERENCE_TIME_CONSTANT_S       10.0f
+
+/* 高度专用加速度低通，不影响姿态环使用的30Hz通用IMU低通。 */
+#define FC_ALT_ACCEL_LPF_HZ                             8.0f
+/* 世界竖直加速度超过此值直接拒绝该帧，不截幅后继续积分。 */
+#define FC_ALT_MAX_TRUSTED_ACCEL_MPS2                   4.0f
+
+/* 气压链路等效延迟：用先验速度前推气压观测；建议每次调0.02秒。 */
+#define FC_ALT_BARO_DELAY_S                              0.12f
+
+/* 气压异常保护：单点跳变门限和相对当前估计的创新绝对上限。 */
+#define FC_BARO_MAX_SAMPLE_STEP_M                        0.50f
+#define FC_BARO_INNOVATION_LIMIT_M                       2.0f
+
+/* 三状态卡尔曼参数：[高度，垂直速度，竖直加速度零偏]。 */
+/* 气压高度标准差：越大越不信气压；应按静止日志的标准差设置。 */
 #define FC_ALT_KF_BARO_STD_M                          0.35f
+/* 加速度过程噪声：越大越允许气压观测修正惯性预测。 */
 #define FC_ALT_KF_ACCEL_STD_MPS2                      1.50f
+/* 加速度零偏随机游走：越大零偏跟踪越快，也更容易追随气压扰动。 */
 #define FC_ALT_KF_ACCEL_BIAS_RW_MPS2_SQRT_S           0.03f
+/* 以下三个初始标准差只影响启动后的收敛速度，首轮调试保持默认。 */
 #define FC_ALT_KF_INITIAL_HEIGHT_STD_M                 0.50f
 #define FC_ALT_KF_INITIAL_VELOCITY_STD_MPS             0.75f
 #define FC_ALT_KF_INITIAL_BIAS_STD_MPS2                0.30f
+/* 加速度零偏物理限幅，防止滤波器把持续真实运动全部吸收到零偏。 */
 #define FC_ALT_KF_MAX_ACCEL_BIAS_MPS2                  1.50f
+/* 创新门限=标准差倍数，并受最小门限和绝对上限共同约束。 */
 #define FC_ALT_KF_INNOVATION_GATE_SIGMA                4.0f
 #define FC_ALT_KF_MIN_INNOVATION_GATE_M                0.75f
+/* 协方差数值保护，不作为飞行调参项。 */
 #define FC_ALT_KF_MIN_VARIANCE                         0.000001f
 #define FC_ALT_KF_MAX_VARIANCE                      1000.0f
 
+/* 仅供互补滤波模式使用。 */
 #define FC_VERTICAL_BARO_POSITION_BLEND              0.5f
 #define FC_VERTICAL_BARO_VELOCITY_BLEND              0.48f
+/* IMU总加速度模长可信范围：0.6g~1.7g，超出时不参与高度预测。 */
 #define FC_VERTICAL_ACCEL_MIN_NORM_SQ                 0.36f
 #define FC_VERTICAL_ACCEL_MAX_NORM_SQ                 2.89f
-#define FC_VERTICAL_ACCEL_LIMIT_MPS2                 12.0f
 #define FC_VERTICAL_MAX_PREDICT_DT_S                  0.02f
-/* A shaky aircraft may bridge short pressure dropouts for 0.4 s using inertia. */
+/* 气压短时丢失最多依靠惯性桥接0.4秒，超时后退出定高。 */
 #define FC_BARO_INERTIAL_HOLD_TIMEOUT_MS             400U
 #define FC_GRAVITY_MPS2                          9.80665f
+
+/* 估计结果保护范围；越界时判无效并退出定高，不把状态硬裁到边界。 */
+#define FC_ALT_ESTIMATE_MIN_M                         -2.0f
+#define FC_ALT_ESTIMATE_MAX_M                         12.0f
+#define FC_ALT_MAX_ESTIMATED_VELOCITY_MPS              3.0f
+
+/* 定高控制器参数：确认估计器正常后再调这一组。 */
 #define FC_ALTITUDE_POSITION_KP                     1.0f
 #define FC_ALTITUDE_VELOCITY_KP                    90.0f
 #define FC_ALTITUDE_VELOCITY_KI                    25.0f
@@ -307,6 +335,18 @@
 #if (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY) && \
     (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_KALMAN)
 #error "FC_ALT_ESTIMATOR_MODE is invalid"
+#endif
+
+#if FC_ALT_ENABLE_ACCEL_LPF > 1U
+#error "FC_ALT_ENABLE_ACCEL_LPF must be 0 or 1"
+#endif
+
+#if FC_ALT_ENABLE_BARO_DELAY_COMPENSATION > 1U
+#error "FC_ALT_ENABLE_BARO_DELAY_COMPENSATION must be 0 or 1"
+#endif
+
+#if FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING > 1U
+#error "FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING must be 0 or 1"
 #endif
 
 #if (FC_MAG_BODY_X_SOURCE > 2U) || (FC_MAG_BODY_Y_SOURCE > 2U) || \

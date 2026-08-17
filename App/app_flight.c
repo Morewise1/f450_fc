@@ -17,7 +17,6 @@
 #include "drv_mmc5983ma.h"
 #include "est_altitude.h"
 #include "est_attitude.h"
-#include "est_inertial_nav.h"
 #include "fc_config.h"
 
 static FcFlightState_t s_state;
@@ -269,12 +268,6 @@ void App_FlightTask500Hz(void)
         return;
     }
 
-    /* Diagnostic only: this estimate is never read by a controller. */
-    (void)Est_InertialNavUpdate(&s_imu,
-                                &s_attitude,
-                                s_state != FC_STATE_RUNNING,
-                                FC_CONTROL_DT_S);
-
     if (s_state != FC_STATE_RUNNING)
     {
         hold_motors_stopped();
@@ -493,6 +486,7 @@ void App_FlightTask50Hz(void)
                                           &s_imu,
                                           &s_attitude,
                                           FC_ALTITUDE_DT_S,
+                                          s_state != FC_STATE_RUNNING,
                                           &s_altitude);
     (void)barometer_status;
     if ((estimator_status != FC_STATUS_OK) || !s_altitude.valid)

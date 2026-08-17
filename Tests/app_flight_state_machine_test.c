@@ -181,11 +181,13 @@ FcStatus_t Est_AltitudeUpdate(const FcBarometerData_t *barometer,
                               const FcImuData_t *imu,
                               const FcAttitude_t *attitude,
                               float dt_s,
+                              bool aircraft_grounded,
                               FcAltitude_t *altitude)
 {
     (void)imu;
     (void)attitude;
     (void)dt_s;
+    (void)aircraft_grounded;
     if ((barometer == NULL) || (altitude == NULL) || !barometer->valid ||
         (s_altitude_status != FC_STATUS_OK))
     {
@@ -210,18 +212,6 @@ FcStatus_t Est_AltitudePredict(const FcImuData_t *imu,
     *altitude = s_fake_altitude;
     altitude->timestamp_ms = timestamp_ms;
     return altitude->valid ? FC_STATUS_OK : FC_STATUS_INVALID_DATA;
-}
-
-FcStatus_t Est_InertialNavUpdate(const FcImuData_t *imu,
-                                 const FcAttitude_t *attitude,
-                                 bool aircraft_stopped,
-                                 float dt_s)
-{
-    (void)imu;
-    (void)attitude;
-    (void)aircraft_stopped;
-    (void)dt_s;
-    return FC_STATUS_OK;
 }
 
 void Ctl_RateReset(void)
