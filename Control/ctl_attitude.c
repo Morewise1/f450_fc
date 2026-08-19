@@ -1,5 +1,6 @@
 /* Bounded proportional attitude outer loop feeding the rate PID. */
 
+#include <math.h>
 #include <stddef.h>
 #include "ctl_attitude.h"
 #include "fc_config.h"
@@ -7,7 +8,9 @@
 
 static bool s_initialized;
 static float s_yaw_target_deg;
+static float s_yaw_center_time_s;
 static bool s_yaw_target_initialized;
+static bool s_yaw_heading_hold_active;
 volatile CtlAttitudeDebug_t g_ctl_attitude_debug;
 
 static float clamp_float(float value, float limit)
@@ -38,6 +41,8 @@ static float update_yaw_target_rate(const FcControlTarget_t *target,
                                     float dt_s)
 {
 #if FC_YAW_CONTROL_MODE == FC_YAW_CONTROL_MODE_HEADING_HOLD
+    float commanded_rate = clamp_float(target->yaw_rate_dps,
+                                       FC_MAX_TARGET_YAW_RATE_DPS);
     float yaw_error;
     float effective_error;
     float target_rate;
@@ -48,8 +53,46 @@ static float update_yaw_target_rate(const FcControlTarget_t *target,
         s_yaw_target_initialized = true;
     }
 
-    s_yaw_target_deg = wrap_degrees(s_yaw_target_deg +
-                                    (target->yaw_rate_dps * dt_s));
+    /*
+     * 有杆时是直接角速度控制，不积分摇杆形成航向目标。目标航向持续同步
+     * 当前实测Yaw，因此松杆后不会再追赶过去积累的±30度误差。
+     */
+    if (fabsf(commanded_rate) > FC_YAW_HOLD_STICK_RATE_THRESHOLD_DPS)
+    {
+        s_yaw_target_deg = attitude->yaw_deg;
+        s_yaw_center_time_s = 0.0f;
+        s_yaw_heading_hold_active = false;
+        g_ctl_attitude_debug.yaw_target_deg = s_yaw_target_deg;
+        g_ctl_attitude_debug.yaw_error_deg = 0.0f;
+        g_ctl_attitude_debug.yaw_center_time_ms = 0.0f;
+        g_ctl_attitude_debug.yaw_target_initialized = true;
+        g_ctl_attitude_debug.heading_hold_enabled = false;
+        g_ctl_attitude_debug.manual_rate_active = true;
+        g_ctl_attitude_debug.center_wait_active = false;
+        return commanded_rate;
+    }
+
+    if (!s_yaw_heading_hold_active)
+    {
+        /* 回中确认期间内环目标角速度为0，先制动，再锁住确认结束时的航向。 */
+        s_yaw_target_deg = attitude->yaw_deg;
+        s_yaw_center_time_s += dt_s;
+        if (s_yaw_center_time_s <
+            ((float)FC_YAW_HOLD_CENTER_CONFIRM_MS * 0.001f))
+        {
+            g_ctl_attitude_debug.yaw_target_deg = s_yaw_target_deg;
+            g_ctl_attitude_debug.yaw_error_deg = 0.0f;
+            g_ctl_attitude_debug.yaw_center_time_ms =
+                s_yaw_center_time_s * 1000.0f;
+            g_ctl_attitude_debug.yaw_target_initialized = true;
+            g_ctl_attitude_debug.heading_hold_enabled = false;
+            g_ctl_attitude_debug.manual_rate_active = false;
+            g_ctl_attitude_debug.center_wait_active = true;
+            return 0.0f;
+        }
+        s_yaw_heading_hold_active = true;
+    }
+
     yaw_error = wrap_degrees(s_yaw_target_deg - attitude->yaw_deg);
 
     /* Do not allow an unavailable yaw actuator to accumulate a large heading demand. */
@@ -66,19 +109,25 @@ static float update_yaw_target_rate(const FcControlTarget_t *target,
 
     effective_error = apply_continuous_deadband(yaw_error,
                                                  FC_ATTITUDE_YAW_DEADBAND_DEG);
-    target_rate = target->yaw_rate_dps + (effective_error * FC_ATTITUDE_YAW_KP);
+    target_rate = effective_error * FC_ATTITUDE_YAW_KP;
     g_ctl_attitude_debug.yaw_target_deg = s_yaw_target_deg;
     g_ctl_attitude_debug.yaw_error_deg = yaw_error;
+    g_ctl_attitude_debug.yaw_center_time_ms = s_yaw_center_time_s * 1000.0f;
     g_ctl_attitude_debug.yaw_target_initialized = true;
     g_ctl_attitude_debug.heading_hold_enabled = true;
+    g_ctl_attitude_debug.manual_rate_active = false;
+    g_ctl_attitude_debug.center_wait_active = false;
     return clamp_float(target_rate, FC_MAX_TARGET_YAW_RATE_DPS);
 #else
     (void)attitude;
     (void)dt_s;
     g_ctl_attitude_debug.yaw_target_deg = 0.0f;
     g_ctl_attitude_debug.yaw_error_deg = 0.0f;
+    g_ctl_attitude_debug.yaw_center_time_ms = 0.0f;
     g_ctl_attitude_debug.yaw_target_initialized = false;
     g_ctl_attitude_debug.heading_hold_enabled = false;
+    g_ctl_attitude_debug.manual_rate_active = true;
+    g_ctl_attitude_debug.center_wait_active = false;
     return clamp_float(target->yaw_rate_dps, FC_MAX_TARGET_YAW_RATE_DPS);
 #endif
 }
@@ -86,7 +135,9 @@ static float update_yaw_target_rate(const FcControlTarget_t *target,
 FcStatus_t Ctl_AttitudeInit(void)
 {
     s_yaw_target_deg = 0.0f;
+    s_yaw_center_time_s = 0.0f;
     s_yaw_target_initialized = false;
+    s_yaw_heading_hold_active = false;
     g_ctl_attitude_debug = (CtlAttitudeDebug_t){0};
     s_initialized = true;
     return FC_STATUS_OK;
@@ -120,6 +171,8 @@ FcStatus_t Ctl_AttitudeUpdate(const FcControlTarget_t *target,
 void Ctl_AttitudeReset(void)
 {
     s_yaw_target_deg = 0.0f;
+    s_yaw_center_time_s = 0.0f;
     s_yaw_target_initialized = false;
+    s_yaw_heading_hold_active = false;
     g_ctl_attitude_debug = (CtlAttitudeDebug_t){0};
 }

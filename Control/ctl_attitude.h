@@ -9,8 +9,11 @@ typedef struct
 {
     float yaw_target_deg;
     float yaw_error_deg;
+    float yaw_center_time_ms;
     bool yaw_target_initialized;
     bool heading_hold_enabled;
+    bool manual_rate_active;
+    bool center_wait_active;
 } CtlAttitudeDebug_t;
 
 extern volatile CtlAttitudeDebug_t g_ctl_attitude_debug;

@@ -98,29 +98,51 @@ int main(void)
         }
     }
 #if FC_YAW_CONTROL_MODE == FC_YAW_CONTROL_MODE_HEADING_HOLD
-    if (!g_ctl_attitude_debug.heading_hold_enabled ||
+    if (g_ctl_attitude_debug.heading_hold_enabled ||
+        !g_ctl_attitude_debug.manual_rate_active ||
         !g_ctl_attitude_debug.yaw_target_initialized ||
         !nearly_equal(g_ctl_attitude_debug.yaw_target_deg,
-                      FC_ATTITUDE_YAW_ERROR_LIMIT_DEG,
+                      attitude.yaw_deg,
                       0.01f) ||
         !nearly_equal(target_rate_dps.z, FC_MAX_TARGET_YAW_RATE_DPS, 0.001f)) { return 16; }
+
+    /* 松杆不再追赶累计航向；先以0角速度制动，确认回中后锁住当前Yaw。 */
     target.yaw_rate_dps = 0.0f;
-    if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f, &target_rate_dps) != FC_STATUS_OK ||
+    for (sample = 0U;
+         sample < ((FC_YAW_HOLD_CENTER_CONFIRM_MS + 3U) / 4U);
+         ++sample)
+    {
+        if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f,
+                               &target_rate_dps) != FC_STATUS_OK ||
+            !nearly_equal(target_rate_dps.z, 0.0f, 0.001f)) { return 17; }
+    }
+    if (!g_ctl_attitude_debug.heading_hold_enabled ||
+        g_ctl_attitude_debug.manual_rate_active ||
+        g_ctl_attitude_debug.center_wait_active) { return 18; }
+    attitude.yaw_deg = 10.0f;
+    if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f,
+                           &target_rate_dps) != FC_STATUS_OK ||
         !nearly_equal(target_rate_dps.z,
-                      (FC_ATTITUDE_YAW_ERROR_LIMIT_DEG - FC_ATTITUDE_YAW_DEADBAND_DEG) *
+                      -(10.0f - FC_ATTITUDE_YAW_DEADBAND_DEG) *
                       FC_ATTITUDE_YAW_KP,
-                      0.001f)) { return 17; }
+                      0.001f)) { return 19; }
 
     Ctl_AttitudeReset();
     attitude.yaw_deg = 179.0f;
-    if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f, &target_rate_dps) != FC_STATUS_OK)
+    for (sample = 0U;
+         sample < ((FC_YAW_HOLD_CENTER_CONFIRM_MS + 3U) / 4U);
+         ++sample)
     {
-        return 18;
+        if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f,
+                               &target_rate_dps) != FC_STATUS_OK)
+        {
+            return 20;
+        }
     }
     attitude.yaw_deg = -179.0f;
     if (Ctl_AttitudeUpdate(&target, &attitude, 0.004f, &target_rate_dps) != FC_STATUS_OK ||
         !nearly_equal(g_ctl_attitude_debug.yaw_error_deg, -2.0f, 0.001f) ||
-        !nearly_equal(target_rate_dps.z, -FC_ATTITUDE_YAW_KP, 0.001f)) { return 19; }
+        !nearly_equal(target_rate_dps.z, -FC_ATTITUDE_YAW_KP, 0.001f)) { return 21; }
 #else
     if (g_ctl_attitude_debug.heading_hold_enabled ||
         !nearly_equal(target_rate_dps.z, FC_MAX_TARGET_YAW_RATE_DPS, 0.001f)) { return 16; }
@@ -128,6 +150,6 @@ int main(void)
 
     imu.valid = false;
     if (Est_AttitudeUpdate(&imu, 0.004f, &attitude) != FC_STATUS_INVALID_DATA ||
-        attitude.valid) { return 20; }
+        attitude.valid) { return 22; }
     return 0;
 }

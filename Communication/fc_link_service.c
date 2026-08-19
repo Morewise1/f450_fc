@@ -19,6 +19,7 @@
 #define VALID_MOTOR      (1U << 5)
 #define VALID_RC         (1U << 6)
 #define VALID_SAFETY     (1U << 7)
+#define VALID_ALT_TARGET FC_LINK_FAST_VALID_ALTITUDE_TARGET_MASK
 
 static FcLinkParser_t s_parser;
 static FcLinkStats_t s_stats;
@@ -27,8 +28,38 @@ static uint32_t s_next_fast_ms;
 static uint32_t s_next_status_ms;
 static uint8_t s_tx_frame[FC_LINK_MAX_FRAME];
 static uint8_t s_pending_frame[FC_LINK_MAX_FRAME];
+/* FC_LINK_MAX_PAYLOAD 可配置到 1024 字节，接收帧不能放在 1 KB 的任务栈上。 */
+static FcLinkFrame_t s_rx_frame;
 static uint16_t s_pending_length;
 static bool s_initialized;
+volatile FcLinkDebug_t g_fc_link_debug;
+
+static void record_tx_frame(const uint8_t *frame, uint16_t length)
+{
+    if ((frame == NULL) || (length < FC_LINK_FIXED_HEADER_SIZE)) { return; }
+    g_fc_link_debug.last_tx_type = frame[3];
+    g_fc_link_debug.last_tx_sequence = FcLink_ReadU16Le(&frame[6]);
+    g_fc_link_debug.last_tx_frame_length = length;
+}
+
+static void record_rx_frame(const FcLinkFrame_t *frame)
+{
+    uint16_t index;
+
+    if (frame == NULL) { return; }
+    g_fc_link_debug.last_rx_type = frame->type;
+    g_fc_link_debug.last_rx_sequence = frame->sequence;
+    g_fc_link_debug.last_rx_payload_length = frame->payload_length;
+    g_fc_link_debug.last_rx_timestamp_ms = frame->timestamp_ms;
+    for (index = 0U; index < frame->payload_length; ++index)
+    {
+        g_fc_link_debug.last_rx_payload[index] = frame->payload[index];
+    }
+    if (g_fc_link_debug.valid_rx_frame_count != UINT32_MAX)
+    {
+        ++g_fc_link_debug.valid_rx_frame_count;
+    }
+}
 
 static bool time_reached(uint32_t now, uint32_t deadline)
 {
@@ -184,6 +215,10 @@ static uint16_t build_fast_payload(uint8_t *payload)
     {
         validity |= VALID_RC;
     }
+    if ((debug.mode == FC_MODE_ALT_HOLD) && debug.altitude.valid)
+    {
+        validity |= VALID_ALT_TARGET;
+    }
     validity |= VALID_SAFETY;
 
     FcLink_WriteU16Le(&payload[offset], validity); offset += 2U;
@@ -230,7 +265,12 @@ static uint16_t build_fast_payload(uint8_t *payload)
     FcLink_WriteU16Le(&payload[offset],
                       App_CommandMuxGetLastRemoteSequence());
     offset += 2U;
-    return offset;
+    if (offset != FC_LINK_FAST_ALTITUDE_TARGET_OFFSET) { return 0U; }
+    /* 控制器积分后的目标高度，不是遥控器油门杆原始值。 */
+    FcLink_WriteI32Le(&payload[offset],
+                      scaled_i32(debug.altitude_target_m, 100.0f));
+    offset += 4U;
+    return (offset == FC_LINK_FAST_TELEMETRY_PAYLOAD_SIZE) ? offset : 0U;
 }
 
 static uint16_t build_status_payload(uint8_t *payload, uint32_t now_ms)
@@ -289,6 +329,7 @@ static bool try_send(uint8_t type,
                        &length) == FC_STATUS_OK) &&
         (BSP_EspUart_WriteAsync(s_tx_frame, length) == FC_STATUS_OK))
     {
+        record_tx_frame(s_tx_frame, length);
         ++s_stats.tx_frames;
         return true;
     }
@@ -304,13 +345,13 @@ FcStatus_t FcLink_Init(void)
     s_next_fast_ms = 0U;
     s_next_status_ms = 0U;
     s_pending_length = 0U;
+    (void)memset((void *)&g_fc_link_debug, 0, sizeof(g_fc_link_debug));
     s_initialized = true;
     return FC_STATUS_OK;
 }
 
 void FcLink_Service(void)
 {
-    FcLinkFrame_t frame;
     bool complete;
     uint8_t value;
     uint8_t payload[48];
@@ -325,13 +366,14 @@ void FcLink_Service(void)
     {
         FcStatus_t status = FcLink_ParserInput(&s_parser,
                                                value,
-                                               &frame,
+                                               &s_rx_frame,
                                                &complete);
         if (status != FC_STATUS_OK) { ++s_stats.rx_errors; }
         if (complete)
         {
+            record_rx_frame(&s_rx_frame);
             ++s_stats.rx_frames;
-            handle_command(&frame, now_ms);
+            handle_command(&s_rx_frame, now_ms);
         }
         ++processed;
     }
@@ -342,6 +384,7 @@ void FcLink_Service(void)
             (BSP_EspUart_WriteAsync(s_pending_frame,
                                     s_pending_length) == FC_STATUS_OK))
         {
+            record_tx_frame(s_pending_frame, s_pending_length);
             ++s_stats.tx_frames;
             s_pending_length = 0U;
         }

@@ -202,7 +202,7 @@
 #define FC_BARO_VELOCITY_LPF_HZ                    3.0f
 #elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_BALANCED
 #define FC_BMP388_IIR_REGISTER_VALUE             0x04U
-#define FC_BARO_PRESSURE_LPF_HZ                    4.0f
+#define FC_BARO_PRESSURE_LPF_HZ                    3.0f
 #define FC_BARO_VELOCITY_LPF_HZ                    1.0f
 #elif FC_BARO_FILTER_MODE == FC_BARO_FILTER_MODE_STRONG
 #define FC_BMP388_IIR_REGISTER_VALUE             0x06U
@@ -216,11 +216,18 @@
  * BMP388 + BMI088 相对高度估计
  * -------------------------------------------------------------------------- */
 
-/* 高度估计器切换：0=互补滤波（回退/对比），1=三状态卡尔曼（默认）。 */
+/*
+ * 高度估计器切换：
+ * 0=固定权重互补滤波（旧版回退）
+ * 1=三状态卡尔曼
+ * 2=动态权重互补滤波（保留用于A/B回放）
+ * 修改后必须Rebuild全部目标并重新烧录，普通Build可能沿用旧目标文件。
+ */
 #define FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY          0U
 #define FC_ALT_ESTIMATOR_MODE_KALMAN                 1U
+#define FC_ALT_ESTIMATOR_MODE_ADAPTIVE_COMPLEMENTARY 2U
 #ifndef FC_ALT_ESTIMATOR_MODE
-#define FC_ALT_ESTIMATOR_MODE FC_ALT_ESTIMATOR_MODE_KALMAN
+#define FC_ALT_ESTIMATOR_MODE FC_ALT_ESTIMATOR_MODE_KALMAN /*default: KF*/
 #endif
 
 /* 功能开关：改成0可分别关闭，便于A/B对比；修改后需完整编译并重新烧录。 */
@@ -234,12 +241,20 @@
 #define FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING       1U
 #endif
 
-/* 起飞零面：50Hz下500点约为10秒；之后仅在STOP/READY继续慢速跟踪。 */
+/* 起飞零面：50Hz下500点约为10秒；之后仅在STOP/READY继续跟踪。 */
 #define FC_BARO_REFERENCE_SAMPLE_COUNT               500U
-#define FC_ALT_GROUND_REFERENCE_TIME_CONSTANT_S       10.0f
+/* 地面气压零面跟踪时间常数；只在STOP/READY生效，进入RUNNING立即冻结。 */
+#define FC_ALT_GROUND_REFERENCE_TIME_CONSTANT_S        1.0f
+/* 地面竖直加速度零偏跟踪时间常数；减小起飞瞬间的速度积分偏置。 */
+#define FC_ALT_GROUND_ACCEL_BIAS_TIME_CONSTANT_S       2.0f
 
 /* 高度专用加速度低通，不影响姿态环使用的30Hz通用IMU低通。 */
-#define FC_ALT_ACCEL_LPF_HZ                             8.0f
+#define FC_ALT_ACCEL_LPF_HZ                             3.0f
+/*
+ * 竖直加速度小信号死区。F450实测静止/振动约±0.2m/s²时，先低通再扣除
+ * 这段死区，避免小噪声被二次积分；真实加速度超过死区的部分仍连续保留。
+ */
+#define FC_ALT_ACCEL_DEADBAND_MPS2                      0.12f
 /* 世界竖直加速度超过此值直接拒绝该帧，不截幅后继续积分。 */
 #define FC_ALT_MAX_TRUSTED_ACCEL_MPS2                   4.0f
 
@@ -252,23 +267,103 @@
 
 /* 三状态卡尔曼参数：[高度，垂直速度，竖直加速度零偏]。 */
 /* 气压高度标准差：越大越不信气压；应按静止日志的标准差设置。 */
-#define FC_ALT_KF_BARO_STD_M                          0.35f
+#define FC_ALT_KF_BARO_STD_M                          0.12f
 /* 加速度过程噪声：越大越允许气压观测修正惯性预测。 */
-#define FC_ALT_KF_ACCEL_STD_MPS2                      1.50f
+#define FC_ALT_KF_ACCEL_STD_MPS2                      3.0f
 /* 加速度零偏随机游走：越大零偏跟踪越快，也更容易追随气压扰动。 */
-#define FC_ALT_KF_ACCEL_BIAS_RW_MPS2_SQRT_S           0.03f
+#define FC_ALT_KF_ACCEL_BIAS_RW_MPS2_SQRT_S           0.05f
 /* 以下三个初始标准差只影响启动后的收敛速度，首轮调试保持默认。 */
 #define FC_ALT_KF_INITIAL_HEIGHT_STD_M                 0.50f
 #define FC_ALT_KF_INITIAL_VELOCITY_STD_MPS             0.75f
 #define FC_ALT_KF_INITIAL_BIAS_STD_MPS2                0.30f
 /* 加速度零偏物理限幅，防止滤波器把持续真实运动全部吸收到零偏。 */
 #define FC_ALT_KF_MAX_ACCEL_BIAS_MPS2                  1.50f
+/*
+ * 阵风/桨流鲁棒气压观测：创新超过软门限后逐渐增大R，而不是突然全收或全拒。
+ * MAX_STD限制最大降权，保证没有其他高度源时气压仍能缓慢约束惯性漂移。
+ */
+#define FC_ALT_KF_BARO_ROBUST_START_M                   0.18f
+#define FC_ALT_KF_BARO_MAX_STD_M                        0.60f
+#define FC_ALT_KF_BARO_NOISE_TIME_CONSTANT_S            0.50f
 /* 创新门限=标准差倍数，并受最小门限和绝对上限共同约束。 */
 #define FC_ALT_KF_INNOVATION_GATE_SIGMA                4.0f
 #define FC_ALT_KF_MIN_INNOVATION_GATE_M                0.75f
 /* 协方差数值保护，不作为飞行调参项。 */
 #define FC_ALT_KF_MIN_VARIANCE                         0.000001f
 #define FC_ALT_KF_MAX_VARIANCE                      1000.0f
+
+/* 起飞意图/离地检测：只决定零面冻结和地面约束，不改变SWC三档定义。 */
+#define FC_TAKEOFF_REFERENCE_FREEZE_US                1300U
+#define FC_TAKEOFF_AIRBORNE_THRUST_US                 1400U
+#define FC_TAKEOFF_PENDING_ABORT_US                   1200U
+#define FC_TAKEOFF_MIN_ALTITUDE_M                       0.08f
+#define FC_TAKEOFF_MIN_VERTICAL_VELOCITY_MPS            0.05f
+#define FC_TAKEOFF_MOTION_CONFIRM_MS                   200U
+#define FC_TAKEOFF_PENDING_ABORT_MS                    600U
+/* 只有低油门且估计确实静止在零面附近，误触发的PENDING才允许回到GROUNDED。 */
+#define FC_TAKEOFF_ABORT_MAX_ALTITUDE_M                  0.05f
+#define FC_TAKEOFF_ABORT_MAX_VERTICAL_VELOCITY_MPS       0.05f
+/* TAKEOFF_PENDING及确认离地后的短时间内提高气压标准差，抑制桨流压力坑。 */
+#define FC_TAKEOFF_BARO_STD_SCALE                        4.0f
+#define FC_TAKEOFF_BARO_RECOVERY_MS                    800U
+
+/* --------------------------------------------------------------------------
+ * 动态权重互补滤波调参区（只在MODE_ADAPTIVE_COMPLEMENTARY下生效）
+ *
+ * 融合式：
+ *   v估计 = m * 惯性预测速度 + (1-m) * 气压速度
+ *   h估计 = n * 惯性预测高度 + (1-n) * 气压高度
+ * m、n越接近1越相信BMI088积分；越小越相信BMP388。
+ * 建议先只调四个MIN/MAX，确认方向正确后再调阈值和Sigmoid斜率。
+ * -------------------------------------------------------------------------- */
+
+/*
+ * 气压速度拟合窗口，单位为50Hz气压样本数。
+ * 增大：速度更平稳但延迟更大；减小：反应更快但速度噪声更大。
+ * 建议范围8~15，首次保持10。
+ */
+#define FC_ALT_ADAPTIVE_BARO_VELOCITY_WINDOW          10U
+
+/*
+ * 拟合后的气压速度低通截止频率。
+ * 增大：速度响应更快、噪声更大；减小：速度更稳、延迟更大。
+ * 建议1.0~3.0Hz；飞机上下窜先减小，跟手太慢再增大。
+ */
+#define FC_ALT_ADAPTIVE_BARO_VELOCITY_LPF_HZ           2.0f
+
+/*
+ * 速度融合惯性权重m的上下限。
+ * MIN增大：悬停时更信加速度积分，响应快但速度更容易漂移。
+ * MIN减小：悬停时更信气压速度，漂移小但可能抖动或滞后。
+ * MAX增大：明显升降时更跟手；不得设为1，否则气压无法拉回漂移。
+ */
+#define FC_ALT_ADAPTIVE_VELOCITY_WEIGHT_MIN             0.940f
+#define FC_ALT_ADAPTIVE_VELOCITY_WEIGHT_MAX             0.995f
+
+/*
+ * 高度融合惯性权重n的上下限。
+ * MIN增大：悬停高度更平滑，但长期气压修正变慢。
+ * MIN减小：更贴近气压高度，但会把气压波动带进输出。
+ * MAX增大：快速升降时延迟更小；不得设为1。
+ */
+#define FC_ALT_ADAPTIVE_HEIGHT_WEIGHT_MIN               0.980f
+#define FC_ALT_ADAPTIVE_HEIGHT_WEIGHT_MAX               0.998f
+
+/*
+ * m = MIN+(MAX-MIN)*sigmoid(K1*(|a|-A0))。
+ * A0增大：需要更强竖直加速度才提高惯性权重，整体更稳但偏慢。
+ * K1增大：从MIN切到MAX更突然；减小则切换更柔和。
+ */
+#define FC_ALT_ADAPTIVE_ACCEL_THRESHOLD_MPS2            0.25f
+#define FC_ALT_ADAPTIVE_ACCEL_SIGMOID_GAIN              8.0f
+
+/*
+ * n = MIN+(MAX-MIN)*sigmoid(K2*(|v上一帧|-V0))。
+ * V0增大：只有较快升降才提高惯性高度权重，气压约束更强。
+ * K2增大：动静切换更敏感；若高度权重来回跳动就减小K2。
+ */
+#define FC_ALT_ADAPTIVE_VELOCITY_THRESHOLD_MPS          0.15f
+#define FC_ALT_ADAPTIVE_VELOCITY_SIGMOID_GAIN          12.0f
 
 /* 仅供互补滤波模式使用。 */
 #define FC_VERTICAL_BARO_POSITION_BLEND              0.5f
@@ -306,7 +401,7 @@
 #define FC_YAW_CONTROL_MODE_RATE             0U
 #define FC_YAW_CONTROL_MODE_HEADING_HOLD     1U
 #ifndef FC_YAW_CONTROL_MODE
-#define FC_YAW_CONTROL_MODE FC_YAW_CONTROL_MODE_HEADING_HOLD
+#define FC_YAW_CONTROL_MODE         FC_YAW_CONTROL_MODE_HEADING_HOLD
 #endif
 
 #define FC_MIXER_ROLL_LIMIT_US             400.0f
@@ -333,8 +428,14 @@
 #endif
 
 #if (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_COMPLEMENTARY) && \
-    (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_KALMAN)
+    (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_KALMAN) && \
+    (FC_ALT_ESTIMATOR_MODE != FC_ALT_ESTIMATOR_MODE_ADAPTIVE_COMPLEMENTARY)
 #error "FC_ALT_ESTIMATOR_MODE is invalid"
+#endif
+
+#if (FC_ALT_ADAPTIVE_BARO_VELOCITY_WINDOW < 3U) || \
+    (FC_ALT_ADAPTIVE_BARO_VELOCITY_WINDOW > 20U)
+#error "Adaptive barometer velocity window must be between 3 and 20 samples"
 #endif
 
 #if FC_ALT_ENABLE_ACCEL_LPF > 1U
@@ -347,6 +448,13 @@
 
 #if FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING > 1U
 #error "FC_ALT_ENABLE_GROUND_REFERENCE_TRACKING must be 0 or 1"
+#endif
+
+#if (FC_TAKEOFF_PENDING_ABORT_US >= FC_TAKEOFF_REFERENCE_FREEZE_US) || \
+    (FC_TAKEOFF_REFERENCE_FREEZE_US >= FC_TAKEOFF_AIRBORNE_THRUST_US) || \
+    (FC_TAKEOFF_MOTION_CONFIRM_MS == 0U) || \
+    (FC_TAKEOFF_PENDING_ABORT_MS == 0U)
+#error "Takeoff detection thresholds are inconsistent"
 #endif
 
 #if (FC_MAG_BODY_X_SOURCE > 2U) || (FC_MAG_BODY_Y_SOURCE > 2U) || \

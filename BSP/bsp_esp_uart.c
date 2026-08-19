@@ -4,7 +4,7 @@
 #include "fc_config.h"
 
 #define ESP_UART_RX_RING_SIZE 256U
-#define ESP_UART_TX_SIZE      160U
+#define ESP_UART_TX_SIZE      BSP_ESP_UART_DEBUG_TX_SIZE
 
 static volatile uint16_t s_rx_head;
 static volatile uint16_t s_rx_tail;
@@ -17,6 +17,7 @@ static uint8_t s_rx_byte;
 #endif
 static uint8_t s_tx_buffer[ESP_UART_TX_SIZE];
 static void *s_uart;
+volatile BspEspUartDebug_t g_esp_uart_debug;
 
 #if FC_USE_STM32_HAL
 #include "main.h"
@@ -25,6 +26,8 @@ static void *s_uart;
 FcStatus_t BSP_EspUart_Init(void *uart_handle)
 {
     if (uart_handle == NULL) { return FC_STATUS_INVALID_ARGUMENT; }
+    (void)memset((void *)&g_esp_uart_debug, 0, sizeof(g_esp_uart_debug));
+    g_esp_uart_debug.last_write_status = FC_STATUS_NOT_READY;
     s_uart = uart_handle;
     s_rx_head = 0U;
     s_rx_tail = 0U;
@@ -43,28 +46,55 @@ FcStatus_t BSP_EspUart_Init(void *uart_handle)
 
 FcStatus_t BSP_EspUart_WriteAsync(const uint8_t *data, uint16_t length)
 {
+    uint16_t index;
+
     if ((data == NULL) || (length == 0U))
     {
+        g_esp_uart_debug.last_write_status = FC_STATUS_INVALID_ARGUMENT;
         return FC_STATUS_INVALID_ARGUMENT;
     }
     if ((length > ESP_UART_TX_SIZE) || (s_uart == NULL))
     {
+        g_esp_uart_debug.last_write_status = FC_STATUS_INVALID_DATA;
         return FC_STATUS_INVALID_DATA;
     }
-    if (s_tx_busy) { return FC_STATUS_BUSY; }
+    if (s_tx_busy)
+    {
+        if (g_esp_uart_debug.tx_busy_reject_count != UINT32_MAX)
+        {
+            ++g_esp_uart_debug.tx_busy_reject_count;
+        }
+        g_esp_uart_debug.last_write_status = FC_STATUS_BUSY;
+        return FC_STATUS_BUSY;
+    }
     (void)memcpy(s_tx_buffer, data, length);
+    for (index = 0U; index < length; ++index)
+    {
+        g_esp_uart_debug.last_tx[index] = data[index];
+    }
+    g_esp_uart_debug.last_tx_length = length;
     s_tx_busy = true;
+    g_esp_uart_debug.tx_busy = true;
 #if FC_USE_STM32_HAL
     if (HAL_UART_Transmit_IT((UART_HandleTypeDef *)s_uart,
                              s_tx_buffer,
                              length) != HAL_OK)
     {
         s_tx_busy = false;
+        g_esp_uart_debug.tx_busy = false;
+        g_esp_uart_debug.last_write_status = FC_STATUS_ERROR;
         return FC_STATUS_ERROR;
     }
+    if (g_esp_uart_debug.tx_start_count != UINT32_MAX)
+    {
+        ++g_esp_uart_debug.tx_start_count;
+    }
+    g_esp_uart_debug.last_write_status = FC_STATUS_OK;
     return FC_STATUS_OK;
 #else
     s_tx_busy = false;
+    g_esp_uart_debug.tx_busy = false;
+    g_esp_uart_debug.last_write_status = FC_STATUS_NOT_IMPLEMENTED;
     return FC_STATUS_NOT_IMPLEMENTED;
 #endif
 }
@@ -92,10 +122,26 @@ void BSP_EspUart_OnRxComplete(void *uart_handle)
     {
         s_rx_ring[s_rx_head] = s_rx_byte;
         s_rx_head = next;
+        g_esp_uart_debug.last_rx_byte = s_rx_byte;
+        g_esp_uart_debug.recent_rx[
+            g_esp_uart_debug.recent_rx_write_index] = s_rx_byte;
+        g_esp_uart_debug.recent_rx_write_index = (uint16_t)(
+            (g_esp_uart_debug.recent_rx_write_index + 1U) %
+            BSP_ESP_UART_DEBUG_RX_RECENT_SIZE);
+        if (g_esp_uart_debug.recent_rx_valid_length <
+            BSP_ESP_UART_DEBUG_RX_RECENT_SIZE)
+        {
+            ++g_esp_uart_debug.recent_rx_valid_length;
+        }
+        if (g_esp_uart_debug.rx_byte_count != UINT32_MAX)
+        {
+            ++g_esp_uart_debug.rx_byte_count;
+        }
     }
     else if (s_rx_overflows != UINT32_MAX)
     {
         ++s_rx_overflows;
+        g_esp_uart_debug.rx_overflow_count = s_rx_overflows;
     }
     if (HAL_UART_Receive_IT((UART_HandleTypeDef *)s_uart,
                             &s_rx_byte,
@@ -110,18 +156,28 @@ void BSP_EspUart_OnRxComplete(void *uart_handle)
 
 void BSP_EspUart_OnTxComplete(void *uart_handle)
 {
-    if (uart_handle == s_uart) { s_tx_busy = false; }
+    if (uart_handle == s_uart)
+    {
+        s_tx_busy = false;
+        g_esp_uart_debug.tx_busy = false;
+        if (g_esp_uart_debug.tx_complete_count != UINT32_MAX)
+        {
+            ++g_esp_uart_debug.tx_complete_count;
+        }
+    }
 }
 
 void BSP_EspUart_OnError(void *uart_handle)
 {
     if (uart_handle != s_uart) { return; }
     if (s_errors != UINT32_MAX) { ++s_errors; }
+    g_esp_uart_debug.uart_error_count = s_errors;
 #if FC_USE_STM32_HAL
     /* Do not release a still-active TX buffer for an unrelated RX error. */
     if (((UART_HandleTypeDef *)s_uart)->gState == HAL_UART_STATE_READY)
     {
         s_tx_busy = false;
+        g_esp_uart_debug.tx_busy = false;
     }
     if (((UART_HandleTypeDef *)s_uart)->RxState == HAL_UART_STATE_READY)
     {

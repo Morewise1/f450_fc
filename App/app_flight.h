@@ -6,6 +6,22 @@
 #include <stdint.h>
 #include "fc_types.h"
 
+typedef enum
+{
+    APP_ALT_HOLD_PHASE_INACTIVE = 0,
+    APP_ALT_HOLD_PHASE_WAIT_CAPTURE,
+    APP_ALT_HOLD_PHASE_ACTIVE,
+    APP_ALT_HOLD_PHASE_EXIT_WAIT,
+    APP_ALT_HOLD_PHASE_EXIT_BLEND
+} AppAltitudeHoldPhase_t;
+
+typedef enum
+{
+    APP_TAKEOFF_PHASE_GROUNDED = 0,
+    APP_TAKEOFF_PHASE_PENDING,
+    APP_TAKEOFF_PHASE_AIRBORNE
+} AppTakeoffPhase_t;
+
 typedef struct
 {
     uint32_t task_500hz_count;
@@ -32,6 +48,17 @@ typedef struct
     uint16_t raw_channels[FC_IBUS_CHANNEL_COUNT];
     FcFlightState_t state;
     FcFlightMode_t mode;
+    AppTakeoffPhase_t takeoff_phase;
+    bool airborne;
+    float barometer_noise_scale;
+    AppAltitudeHoldPhase_t altitude_hold_phase;
+    bool altitude_throttle_captured;
+    bool altitude_entry_blend_active;
+    float altitude_target_m;
+    float altitude_correction_us;
+    uint16_t manual_throttle_command_us;
+    uint16_t automatic_throttle_command_us;
+    uint16_t throttle_command_us;
     bool motor_safe;
     uint32_t publish_count;
 } AppFlightDebug_t;

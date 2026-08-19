@@ -1,5 +1,6 @@
 /* Cooperative flight tasks and explicit fail-closed state transitions. */
 
+#include <math.h>
 #include "app_flight.h"
 #include "app_command_mux.h"
 #include "app_safety.h"
@@ -18,6 +19,7 @@
 #include "est_altitude.h"
 #include "est_attitude.h"
 #include "fc_config.h"
+#include "fc_params.h"
 
 static FcFlightState_t s_state;
 static FcFlightMode_t s_mode;
@@ -35,11 +37,131 @@ static FcMotorOutput_t s_motor_output;
 static AppFlightTaskStats_t s_task_stats;
 static float s_altitude_target_m;
 static float s_altitude_correction_us;
-static float s_altitude_hold_stick_center;
-static uint16_t s_altitude_hold_base_throttle_us;
+static AppAltitudeHoldPhase_t s_altitude_hold_phase;
+static bool s_altitude_throttle_captured;
+static bool s_altitude_entry_blend_active;
+static uint16_t s_altitude_entry_blend_start_us;
+static uint16_t s_altitude_exit_blend_start_us;
+static uint32_t s_altitude_entry_blend_start_ms;
+static uint32_t s_altitude_exit_blend_start_ms;
+static AppTakeoffPhase_t s_takeoff_phase;
+static uint32_t s_takeoff_motion_start_ms;
+static uint32_t s_takeoff_abort_start_ms;
+static uint32_t s_airborne_confirmed_ms;
+static bool s_takeoff_motion_timing;
+static bool s_takeoff_abort_timing;
 static bool s_initialized;
 static bool s_altitude_hold_fault_latched;
 volatile AppFlightDebug_t g_fc_flight_debug;
+
+static uint16_t build_throttle_command_us(void);
+
+static void reset_takeoff_runtime(void)
+{
+    s_takeoff_phase = APP_TAKEOFF_PHASE_GROUNDED;
+    s_takeoff_motion_start_ms = 0U;
+    s_takeoff_abort_start_ms = 0U;
+    s_airborne_confirmed_ms = 0U;
+    s_takeoff_motion_timing = false;
+    s_takeoff_abort_timing = false;
+}
+
+static bool altitude_ground_constraint_active(void)
+{
+    return s_takeoff_phase == APP_TAKEOFF_PHASE_GROUNDED;
+}
+
+static float current_barometer_noise_scale(uint32_t now_ms)
+{
+    if (s_takeoff_phase == APP_TAKEOFF_PHASE_PENDING)
+    {
+        return FC_TAKEOFF_BARO_STD_SCALE;
+    }
+    if ((s_takeoff_phase == APP_TAKEOFF_PHASE_AIRBORNE) &&
+        ((now_ms - s_airborne_confirmed_ms) < FC_TAKEOFF_BARO_RECOVERY_MS))
+    {
+        return FC_TAKEOFF_BARO_STD_SCALE;
+    }
+    return 1.0f;
+}
+
+static void update_takeoff_phase(uint32_t now_ms)
+{
+    uint16_t throttle_us;
+    bool upward_motion;
+    bool near_ground_still;
+
+    if (s_state != FC_STATE_RUNNING)
+    {
+        reset_takeoff_runtime();
+        return;
+    }
+    if (s_takeoff_phase == APP_TAKEOFF_PHASE_AIRBORNE)
+    {
+        /* 空中状态锁存到停机；不能因收油或气压漂移而重新施加地面零约束。 */
+        return;
+    }
+
+    throttle_us = build_throttle_command_us();
+    if (s_takeoff_phase == APP_TAKEOFF_PHASE_GROUNDED)
+    {
+        if (throttle_us >= FC_TAKEOFF_REFERENCE_FREEZE_US)
+        {
+            s_takeoff_phase = APP_TAKEOFF_PHASE_PENDING;
+            s_takeoff_motion_timing = false;
+            s_takeoff_abort_timing = false;
+        }
+        return;
+    }
+
+    upward_motion = s_altitude.valid &&
+        (s_altitude.altitude_m >= FC_TAKEOFF_MIN_ALTITUDE_M) &&
+        (s_altitude.vertical_velocity_mps >=
+         FC_TAKEOFF_MIN_VERTICAL_VELOCITY_MPS);
+    if ((throttle_us >= FC_TAKEOFF_AIRBORNE_THRUST_US) && upward_motion)
+    {
+        if (!s_takeoff_motion_timing)
+        {
+            s_takeoff_motion_start_ms = now_ms;
+            s_takeoff_motion_timing = true;
+        }
+        if ((now_ms - s_takeoff_motion_start_ms) >=
+            FC_TAKEOFF_MOTION_CONFIRM_MS)
+        {
+            s_takeoff_phase = APP_TAKEOFF_PHASE_AIRBORNE;
+            s_airborne_confirmed_ms = now_ms;
+            s_takeoff_abort_timing = false;
+            return;
+        }
+    }
+    else
+    {
+        s_takeoff_motion_timing = false;
+    }
+
+    near_ground_still = s_altitude.valid &&
+        (fabsf(s_altitude.altitude_m) <=
+         FC_TAKEOFF_ABORT_MAX_ALTITUDE_M) &&
+        (fabsf(s_altitude.vertical_velocity_mps) <=
+         FC_TAKEOFF_ABORT_MAX_VERTICAL_VELOCITY_MPS);
+    if ((throttle_us < FC_TAKEOFF_PENDING_ABORT_US) && near_ground_still)
+    {
+        if (!s_takeoff_abort_timing)
+        {
+            s_takeoff_abort_start_ms = now_ms;
+            s_takeoff_abort_timing = true;
+        }
+        if ((now_ms - s_takeoff_abort_start_ms) >=
+            FC_TAKEOFF_PENDING_ABORT_MS)
+        {
+            reset_takeoff_runtime();
+        }
+    }
+    else
+    {
+        s_takeoff_abort_timing = false;
+    }
+}
 
 static uint16_t build_manual_throttle_command_us(void)
 {
@@ -51,9 +173,62 @@ static uint16_t build_manual_throttle_command_us(void)
     return (uint16_t)(throttle_us + 0.5f);
 }
 
+static uint16_t clamp_throttle_us(float throttle_us)
+{
+    if (throttle_us < (float)FC_ESC_IDLE_US) { throttle_us = (float)FC_ESC_IDLE_US; }
+    if (throttle_us > (float)FC_ESC_COMMAND_MAX_US) { throttle_us = (float)FC_ESC_COMMAND_MAX_US; }
+    return (uint16_t)(throttle_us + 0.5f);
+}
+
+static uint16_t build_altitude_hold_throttle_command_us(void)
+{
+    return clamp_throttle_us((float)FC_HOVER_FEEDFORWARD_US +
+                             s_altitude_correction_us);
+}
+
+static bool throttle_is_in_altitude_capture_window(uint16_t throttle_us)
+{
+    return (throttle_us >= FC_ALT_HOLD_STICK_CAPTURE_MIN_US) &&
+           (throttle_us <= FC_ALT_HOLD_STICK_CAPTURE_MAX_US);
+}
+
+static uint16_t throttle_difference_us(uint16_t a, uint16_t b)
+{
+    return (a >= b) ? (uint16_t)(a - b) : (uint16_t)(b - a);
+}
+
+static float handover_progress(uint32_t now_ms, uint32_t start_ms)
+{
+    uint32_t elapsed_ms = now_ms - start_ms;
+    if (elapsed_ms >= FC_ALT_HOLD_HANDOVER_BLEND_TIME_MS) { return 1.0f; }
+    return (float)elapsed_ms / (float)FC_ALT_HOLD_HANDOVER_BLEND_TIME_MS;
+}
+
+static uint16_t blend_throttle_us(uint16_t from_us, uint16_t to_us, float alpha)
+{
+    float blended;
+
+    if (alpha <= 0.0f) { return from_us; }
+    if (alpha >= 1.0f) { return to_us; }
+    blended = (float)from_us + ((float)to_us - (float)from_us) * alpha;
+    return clamp_throttle_us(blended);
+}
+
+static void reset_altitude_hold_runtime(void)
+{
+    s_altitude_hold_phase = APP_ALT_HOLD_PHASE_INACTIVE;
+    s_altitude_throttle_captured = false;
+    s_altitude_entry_blend_active = false;
+    s_altitude_entry_blend_start_us = FC_HOVER_FEEDFORWARD_US;
+    s_altitude_exit_blend_start_us = FC_HOVER_FEEDFORWARD_US;
+    s_altitude_entry_blend_start_ms = 0U;
+    s_altitude_exit_blend_start_ms = 0U;
+}
+
 static void publish_debug_snapshot(void)
 {
-    AppFlightDebug_t snapshot = {0};
+    /* 调试快照较大，放静态区可避免占用启动文件中仅1KB的主栈。 */
+    static AppFlightDebug_t snapshot;
 
     snapshot.imu = s_imu;
     snapshot.attitude = s_attitude;
@@ -67,6 +242,19 @@ static void publish_debug_snapshot(void)
     snapshot.target_rate_dps = s_target_rate_dps;
     snapshot.state = s_state;
     snapshot.mode = s_mode;
+    snapshot.takeoff_phase = s_takeoff_phase;
+    snapshot.airborne = s_takeoff_phase == APP_TAKEOFF_PHASE_AIRBORNE;
+    snapshot.barometer_noise_scale = current_barometer_noise_scale(
+        App_SchedulerGetTickMs());
+    snapshot.altitude_hold_phase = s_altitude_hold_phase;
+    snapshot.altitude_throttle_captured = s_altitude_throttle_captured;
+    snapshot.altitude_entry_blend_active = s_altitude_entry_blend_active;
+    snapshot.altitude_target_m = s_altitude_target_m;
+    snapshot.altitude_correction_us = s_altitude_correction_us;
+    snapshot.manual_throttle_command_us = build_manual_throttle_command_us();
+    snapshot.automatic_throttle_command_us =
+        build_altitude_hold_throttle_command_us();
+    snapshot.throttle_command_us = build_throttle_command_us();
     snapshot.motor_safe = App_SafetyMotorOutputAllowed();
     snapshot.publish_count = g_fc_flight_debug.publish_count + 1U;
     (void)App_SafetyGetStatus(&snapshot.safety);
@@ -88,8 +276,8 @@ static void reset_control_pids(void)
     s_target_rate_dps = (FcVector3f_t){0};
     s_control_output = (FcControlOutput_t){0};
     s_altitude_correction_us = 0.0f;
-    s_altitude_hold_stick_center = 0.0f;
-    s_altitude_hold_base_throttle_us = FC_ESC_IDLE_US;
+    reset_altitude_hold_runtime();
+    reset_takeoff_runtime();
 }
 
 static bool state_transition_is_allowed(FcFlightState_t current,
@@ -125,6 +313,8 @@ static FcStatus_t reject_transition(FcStatus_t reason)
 {
     reset_control_pids();
     s_state = FC_STATE_STOP;
+    s_mode = FC_MODE_STABILIZE;
+    s_altitude_target_m = 0.0f;
     hold_motors_stopped();
     return reason;
 }
@@ -153,6 +343,11 @@ static FcStatus_t transition_state(FcFlightState_t next_state)
     /* Every actual state entry resets all control PID state. */
     reset_control_pids();
     s_state = next_state;
+    if (next_state == FC_STATE_STOP)
+    {
+        s_mode = FC_MODE_STABILIZE;
+        s_altitude_target_m = 0.0f;
+    }
     if ((next_state == FC_STATE_RUNNING) &&
         (s_mode == FC_MODE_ALT_HOLD) && s_altitude.valid)
     {
@@ -177,7 +372,6 @@ static FcStatus_t change_mode(FcFlightMode_t next_mode)
         return FC_STATUS_INVALID_DATA;
     }
 
-    /* Check mode prerequisites even when the requested mode did not change. */
     if ((next_mode == FC_MODE_ALT_HOLD) && !s_altitude.valid)
     {
         return FC_STATUS_NOT_READY;
@@ -187,16 +381,22 @@ static FcStatus_t change_mode(FcFlightMode_t next_mode)
         return FC_STATUS_OK;
     }
 
-    reset_control_pids();
+    /* 垂直模式切换不重置姿态/角速度环，避免集体油门交接引入姿态突跳。 */
+    Ctl_AltitudeReset();
+    s_altitude_correction_us = 0.0f;
     if (next_mode == FC_MODE_ALT_HOLD)
     {
         s_altitude_target_m = s_altitude.altitude_m;
-        s_altitude_hold_stick_center = s_pilot.throttle;
-        s_altitude_hold_base_throttle_us = build_manual_throttle_command_us();
+        s_altitude_throttle_captured = false;
+        s_altitude_hold_phase = APP_ALT_HOLD_PHASE_WAIT_CAPTURE;
+        s_altitude_entry_blend_start_us = build_manual_throttle_command_us();
+        s_altitude_entry_blend_start_ms = App_SchedulerGetTickMs();
+        s_altitude_entry_blend_active = true;
     }
     else
     {
         s_altitude_target_m = 0.0f;
+        reset_altitude_hold_runtime();
     }
     s_mode = next_mode;
     return FC_STATUS_OK;
@@ -204,20 +404,122 @@ static FcStatus_t change_mode(FcFlightMode_t next_mode)
 
 static uint16_t build_throttle_command_us(void)
 {
-    float throttle_us;
+    uint16_t throttle_us;
 
     if (s_mode == FC_MODE_ALT_HOLD)
     {
-        throttle_us = (float)s_altitude_hold_base_throttle_us +
-                      s_altitude_correction_us;
+        uint16_t automatic_us = build_altitude_hold_throttle_command_us();
+        uint16_t manual_us = build_manual_throttle_command_us();
+        uint32_t now_ms = App_SchedulerGetTickMs();
+
+        if (s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_BLEND)
+        {
+            throttle_us = blend_throttle_us(
+                s_altitude_exit_blend_start_us,
+                manual_us,
+                handover_progress(now_ms, s_altitude_exit_blend_start_ms));
+        }
+        else if (s_altitude_entry_blend_active)
+        {
+            throttle_us = blend_throttle_us(
+                s_altitude_entry_blend_start_us,
+                automatic_us,
+                handover_progress(now_ms, s_altitude_entry_blend_start_ms));
+        }
+        else
+        {
+            throttle_us = automatic_us;
+        }
     }
     else
     {
-        throttle_us = (float)build_manual_throttle_command_us();
+        throttle_us = build_manual_throttle_command_us();
     }
-    if (throttle_us < (float)FC_ESC_IDLE_US) { throttle_us = (float)FC_ESC_IDLE_US; }
-    if (throttle_us > (float)FC_ESC_COMMAND_MAX_US) { throttle_us = (float)FC_ESC_COMMAND_MAX_US; }
-    return (uint16_t)(throttle_us + 0.5f);
+    return throttle_us;
+}
+
+static void begin_manual_handover(void)
+{
+    if ((s_altitude_hold_phase != APP_ALT_HOLD_PHASE_EXIT_WAIT) &&
+        (s_altitude_hold_phase != APP_ALT_HOLD_PHASE_EXIT_BLEND))
+    {
+        s_altitude_hold_phase = APP_ALT_HOLD_PHASE_EXIT_WAIT;
+    }
+}
+
+static void cancel_manual_handover(uint32_t now_ms)
+{
+    if (s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_BLEND)
+    {
+        /* CH6重新拨高时，从当前总油门平滑恢复自动定高。 */
+        s_altitude_entry_blend_start_us = build_throttle_command_us();
+        s_altitude_entry_blend_start_ms = now_ms;
+        s_altitude_entry_blend_active = true;
+    }
+    s_altitude_hold_phase = s_altitude_throttle_captured ?
+                            APP_ALT_HOLD_PHASE_ACTIVE :
+                            APP_ALT_HOLD_PHASE_WAIT_CAPTURE;
+}
+
+static FcStatus_t update_altitude_mode_handover(uint32_t now_ms)
+{
+    uint16_t manual_us;
+
+    if (s_mode == FC_MODE_STABILIZE)
+    {
+        if (s_rc.mode_switch && !s_altitude_hold_fault_latched &&
+            (s_state == FC_STATE_RUNNING) && s_altitude.valid)
+        {
+            return change_mode(FC_MODE_ALT_HOLD);
+        }
+        return FC_STATUS_OK;
+    }
+    if (s_mode != FC_MODE_ALT_HOLD) { return FC_STATUS_INVALID_DATA; }
+
+    if (s_altitude_entry_blend_active &&
+        (handover_progress(now_ms, s_altitude_entry_blend_start_ms) >= 1.0f))
+    {
+        s_altitude_entry_blend_active = false;
+    }
+    if (s_rc.mode_switch)
+    {
+        if ((s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_WAIT) ||
+            (s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_BLEND))
+        {
+            cancel_manual_handover(now_ms);
+        }
+        return FC_STATUS_OK;
+    }
+
+    /* CH6拨低只请求交权；油门未回捕获区前继续保持定高。 */
+    begin_manual_handover();
+    manual_us = build_manual_throttle_command_us();
+    if (s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_WAIT)
+    {
+        uint16_t automatic_us;
+
+        if (!throttle_is_in_altitude_capture_window(manual_us))
+        {
+            return FC_STATUS_OK;
+        }
+        automatic_us = build_throttle_command_us();
+        if (throttle_difference_us(automatic_us, manual_us) <=
+            FC_ALT_HOLD_HANDOVER_DIRECT_TOLERANCE_US)
+        {
+            return change_mode(FC_MODE_STABILIZE);
+        }
+        s_altitude_exit_blend_start_us = automatic_us;
+        s_altitude_exit_blend_start_ms = now_ms;
+        s_altitude_entry_blend_active = false;
+        s_altitude_hold_phase = APP_ALT_HOLD_PHASE_EXIT_BLEND;
+        return FC_STATUS_OK;
+    }
+    if ((s_altitude_hold_phase == APP_ALT_HOLD_PHASE_EXIT_BLEND) &&
+        (handover_progress(now_ms, s_altitude_exit_blend_start_ms) >= 1.0f))
+    {
+        return change_mode(FC_MODE_STABILIZE);
+    }
+    return FC_STATUS_OK;
 }
 
 FcStatus_t App_FlightInit(void)
@@ -239,8 +541,8 @@ FcStatus_t App_FlightInit(void)
     s_task_stats = (AppFlightTaskStats_t){0};
     s_altitude_target_m = 0.0f;
     s_altitude_correction_us = 0.0f;
-    s_altitude_hold_stick_center = 0.0f;
-    s_altitude_hold_base_throttle_us = FC_ESC_IDLE_US;
+    reset_altitude_hold_runtime();
+    reset_takeoff_runtime();
     Ctl_MixerSetStop(&s_motor_output);
     g_fc_flight_debug = (AppFlightDebug_t){0};
     (void)BSP_EscPwm_StopAll();
@@ -339,6 +641,7 @@ void App_FlightTask250Hz(void)
                               &s_attitude,
                               FC_ATTITUDE_DT_S,
                               now_ms,
+                              altitude_ground_constraint_active(),
                               &s_altitude);
 
     if (s_state != FC_STATE_RUNNING)
@@ -368,7 +671,6 @@ void App_FlightTask100Hz(void)
 {
     AppSchedulerStats_t scheduler_stats = {0};
     FcRcInput_t ibus_input = {0};
-    FcFlightMode_t requested_mode;
     uint32_t now_ms;
     bool scheduler_ok;
 
@@ -425,11 +727,8 @@ void App_FlightTask100Hz(void)
 
     /* Pulling the switch low acknowledges an altitude-hold sensor fault. */
     if (!s_rc.mode_switch) { s_altitude_hold_fault_latched = false; }
-    /* Altitude hold may only be entered after take-off with a valid estimate. */
-    requested_mode = (s_rc.mode_switch && !s_altitude_hold_fault_latched &&
-                      (s_state == FC_STATE_RUNNING) && s_altitude.valid) ?
-                     FC_MODE_ALT_HOLD : FC_MODE_STABILIZE;
-    if (change_mode(requested_mode) != FC_STATUS_OK)
+    /* 定高模式只允许在飞行中进入，并在进入/退出时完成油门无扰交接。 */
+    if (update_altitude_mode_handover(now_ms) != FC_STATUS_OK)
     {
         force_stop();
         return;
@@ -467,6 +766,7 @@ void App_FlightTask100Hz(void)
             force_stop();
             break;
     }
+    update_takeoff_phase(now_ms);
     publish_debug_snapshot();
 }
 
@@ -481,13 +781,19 @@ void App_FlightTask50Hz(void)
     }
     ++s_task_stats.task_50hz_count;
 
-    barometer_status = Drv_Bmp388_Read(&s_barometer, App_SchedulerGetTickMs());
-    estimator_status = Est_AltitudeUpdate(&s_barometer,
-                                          &s_imu,
-                                          &s_attitude,
-                                          FC_ALTITUDE_DT_S,
-                                          s_state != FC_STATE_RUNNING,
-                                          &s_altitude);
+    {
+        uint32_t now_ms = App_SchedulerGetTickMs();
+        float barometer_noise_scale = current_barometer_noise_scale(now_ms);
+
+        barometer_status = Drv_Bmp388_Read(&s_barometer, now_ms);
+        estimator_status = Est_AltitudeUpdate(&s_barometer,
+                                              &s_imu,
+                                              &s_attitude,
+                                              FC_ALTITUDE_DT_S,
+                                              altitude_ground_constraint_active(),
+                                              barometer_noise_scale,
+                                              &s_altitude);
+    }
     (void)barometer_status;
     if ((estimator_status != FC_STATUS_OK) || !s_altitude.valid)
     {
@@ -504,15 +810,39 @@ void App_FlightTask50Hz(void)
 
     if ((s_mode == FC_MODE_ALT_HOLD) && (s_state == FC_STATE_RUNNING))
     {
-        float stick_delta = s_pilot.throttle - s_altitude_hold_stick_center;
+        uint16_t manual_us = build_manual_throttle_command_us();
 
-        if ((stick_delta > FC_ALTITUDE_STICK_DEADBAND) ||
-            (stick_delta < -FC_ALTITUDE_STICK_DEADBAND))
+        /*
+         * 刚进入定高时先等待油门进入捕获区，避免原来的高/低油门位置
+         * 立即被解释为升降高度指令。
+         */
+        if ((s_altitude_hold_phase == APP_ALT_HOLD_PHASE_WAIT_CAPTURE) &&
+            s_rc.mode_switch &&
+            throttle_is_in_altitude_capture_window(manual_us))
         {
-            float effective_stick = stick_delta -
-                ((stick_delta > 0.0f) ? FC_ALTITUDE_STICK_DEADBAND :
-                                       -FC_ALTITUDE_STICK_DEADBAND);
-            s_altitude_target_m += effective_stick *
+            s_altitude_throttle_captured = true;
+            s_altitude_hold_phase = APP_ALT_HOLD_PHASE_ACTIVE;
+        }
+
+        if (s_altitude_hold_phase == APP_ALT_HOLD_PHASE_ACTIVE)
+        {
+            float normalized_vertical_command = 0.0f;
+
+            if (manual_us > FC_ALT_HOLD_STICK_CAPTURE_MAX_US)
+            {
+                normalized_vertical_command =
+                    (float)(manual_us - FC_ALT_HOLD_STICK_CAPTURE_MAX_US) /
+                    (float)(FC_ESC_COMMAND_MAX_US - FC_ALT_HOLD_STICK_CAPTURE_MAX_US);
+            }
+            else if (manual_us < FC_ALT_HOLD_STICK_CAPTURE_MIN_US)
+            {
+                normalized_vertical_command =
+                    -(float)(FC_ALT_HOLD_STICK_CAPTURE_MIN_US - manual_us) /
+                    (float)(FC_ALT_HOLD_STICK_CAPTURE_MIN_US - FC_ESC_IDLE_US);
+            }
+
+            /* 捕获区内保持目标高度，捕获区外按比例改变目标高度。 */
+            s_altitude_target_m += normalized_vertical_command *
                                    FC_ALTITUDE_MAX_VERTICAL_SPEED_MPS *
                                    FC_ALTITUDE_DT_S;
             if (s_altitude_target_m < FC_ALTITUDE_MIN_TARGET_M)
@@ -524,14 +854,18 @@ void App_FlightTask50Hz(void)
                 s_altitude_target_m = FC_ALTITUDE_MAX_TARGET_M;
             }
         }
-        if (Ctl_AltitudeUpdate(s_altitude_target_m,
-                               &s_altitude,
-                               FC_ALTITUDE_DT_S,
-                               &s_altitude_correction_us) != FC_STATUS_OK)
+        /* 退出混合阶段已经把总油门平滑移交给手动，不再更新高度 PID。 */
+        if (s_altitude_hold_phase != APP_ALT_HOLD_PHASE_EXIT_BLEND)
         {
-            s_altitude_correction_us = 0.0f;
-            s_altitude_hold_fault_latched = true;
-            (void)change_mode(FC_MODE_STABILIZE);
+            if (Ctl_AltitudeUpdate(s_altitude_target_m,
+                                   &s_altitude,
+                                   FC_ALTITUDE_DT_S,
+                                   &s_altitude_correction_us) != FC_STATUS_OK)
+            {
+                s_altitude_correction_us = 0.0f;
+                s_altitude_hold_fault_latched = true;
+                (void)change_mode(FC_MODE_STABILIZE);
+            }
         }
     }
     else
@@ -607,6 +941,17 @@ FcStatus_t App_FlightGetDebug(AppFlightDebug_t *debug)
     }
     debug->state = g_fc_flight_debug.state;
     debug->mode = g_fc_flight_debug.mode;
+    debug->takeoff_phase = g_fc_flight_debug.takeoff_phase;
+    debug->airborne = g_fc_flight_debug.airborne;
+    debug->barometer_noise_scale = g_fc_flight_debug.barometer_noise_scale;
+    debug->altitude_hold_phase = g_fc_flight_debug.altitude_hold_phase;
+    debug->altitude_throttle_captured = g_fc_flight_debug.altitude_throttle_captured;
+    debug->altitude_entry_blend_active = g_fc_flight_debug.altitude_entry_blend_active;
+    debug->altitude_target_m = g_fc_flight_debug.altitude_target_m;
+    debug->altitude_correction_us = g_fc_flight_debug.altitude_correction_us;
+    debug->manual_throttle_command_us = g_fc_flight_debug.manual_throttle_command_us;
+    debug->automatic_throttle_command_us = g_fc_flight_debug.automatic_throttle_command_us;
+    debug->throttle_command_us = g_fc_flight_debug.throttle_command_us;
     debug->motor_safe = g_fc_flight_debug.motor_safe;
     debug->publish_count = g_fc_flight_debug.publish_count;
     return s_initialized ? FC_STATUS_OK : FC_STATUS_NOT_INITIALIZED;

@@ -11,9 +11,14 @@
 #define FC_LINK_VERSION                0x01U
 #define FC_LINK_FIXED_HEADER_SIZE      12U
 #define FC_LINK_CRC_SIZE                2U
-#define FC_LINK_MAX_PAYLOAD           128U
+#define FC_LINK_MAX_PAYLOAD           1024U
 #define FC_LINK_MAX_FRAME             \
     (FC_LINK_FIXED_HEADER_SIZE + FC_LINK_MAX_PAYLOAD + FC_LINK_CRC_SIZE)
+
+/* FAST_TELEMETRY v1.2：原42字节后追加4字节目标高度（int32，小端，单位0.01m）。 */
+#define FC_LINK_FAST_TELEMETRY_PAYLOAD_SIZE             46U
+#define FC_LINK_FAST_ALTITUDE_TARGET_OFFSET             42U
+#define FC_LINK_FAST_VALID_ALTITUDE_TARGET_MASK    (1U << 8)
 
 typedef enum
 {
